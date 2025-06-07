@@ -8,9 +8,13 @@ const PRECACHE_URLS = [
   './',
   './index.html',
   './styles.css',
-  './app.js',
+  './Script.js',
   './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icons/icon-512.png',
+  './manifest.json',       // Your app's manifest file
+  './fonts/nunito.woff2',  // If using custom fonts
+  './bill.png',     // Your app's logo
+  './offline.html'         // Your custom offline page
 ];
 
 // Install and precache static assets
