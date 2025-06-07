@@ -10,7 +10,6 @@ const PRECACHE_URLS = [
   './styles.css',
   './Script.js',
   './bill.png',
-  './Script.js',
   './manifest.json',       // Your app's manifest file
   './fonts/nunito.woff2',  // If using custom fonts
   './bill.png',     // Your app's logo
