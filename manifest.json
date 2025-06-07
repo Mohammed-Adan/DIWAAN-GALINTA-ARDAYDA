@@ -13,25 +13,25 @@
   },
   "icons": [
     {
-      "src": "Icon.jpg",
+      "src": "bill.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "Icon.jpg",
+      "src": "bill.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "Icon.jpg",
+      "src": "bill.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "Icon.jpg",
+      "src": "bill.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
