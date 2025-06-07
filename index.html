@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maamulka Ardayda & Lacagta</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+   <link rel="stylesheet" href="/style.css">
+  
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    
+    <div class="logo-icon">
+      <i class="fas fa-user-ninja"></i>
+    </div>
+    <h1>Maamulka Ardayda & Lacag bixinta</h1>
+  </div>
+  
+  <button id="darkModeToggle" class="dark-mode-toggle">
+    <i class="fas fa-moon"></i>
+  </button>
+  <p class="subtitle">Diiwaangelinta ardayda iyo xogta lacag bixintooda si fudud oo sax ah</p>
+</div>
+
+<div class="toolbar">
+  <div class="search-container">
+    <i class="fas fa-search search-icon"></i>
+    <input type="text" id="searchInput" class="search-input" placeholder="Raadi ardayga...">
+  </div>
+  <div class="month-selector">
+    <i class="fas fa-calendar-alt"></i>
+    <select id="monthSelect"></select>
+  </div>
+  <div class="filter-buttons">
+    <button class="filter-btn active" data-filter="all">
+      <i class="fas fa-list"></i> Dhammaan
+    </button>
+    <button class="filter-btn" data-filter="paid">
+      <i class="fas fa-check-circle"></i> Bixiyay
+    </button>
+    <button class="filter-btn" data-filter="unpaid">
+      <i class="fas fa-times-circle"></i> Aan bixin
+    </button>
+  </div>
+
+<input type="file" id="fileInput" style="display: none;">
+
+</div>
+
+<div class="input-card">
+  <div class="input-group">
+    <input type="text" id="studentName" class="form-control" placeholder="Geli magaca ardayga...">
+    <button class="btn btn-primary" onclick="addStudent()">
+      <i class="fas fa-plus"></i> Ku dar Ardayga
+    </button>
+  </div>
+</div>
+
+<div class="student-list" id="studentList"></div>
+
+<div class="summary-cards">
+  <div class="summary-card">
+    <div class="summary-value" id="totalStudents">0</div>
+    <div class="summary-label">Wadarta Ardayda</div>
+  </div>
+  <div class="summary-card">
+    <div class="summary-value" id="paidStudents">0</div>
+    <div class="summary-label">Lacagta Bixiyay</div>
+  </div>
+  <div class="summary-card">
+    <div class="summary-value" id="unpaidStudents">0</div>
+    <div class="summary-label">Lacagta aan Bixin</div>
+  </div>
+</div>
+    <script src="/Script.js"></script>
+
+
+</script>
+</body>
+</html>
