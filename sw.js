@@ -1,103 +1,54 @@
-const CACHE_NAME = "Diwaanka-ardayda-cache-v2"; // Updated cache name
-const OFFLINE_PAGE = "offline.html";
-const DATA_CACHE = "ardayda-data-v1";
+// This is the service worker with the combined offline experience (Offline page + Offline copy of pages)
+const CACHE_NAME = "offline-cache-v1";
+const CACHE = "offline.html";
 
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/5.1.2/workbox-sw.js');
 
-// Precaching
-self.addEventListener('install', (event) => {
-  const urlsToCache = [
-    '/',
-    '/index.html',
-    '/styles.css',
-    '/app.js',
-    '/offline.html',
-    '/icons/icon-192.png',
-    '/icons/icon-512.png'
-  ];
-  
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
-      .then(() => self.skipWaiting())
-  );
-});
+// TODO: replace the following with the correct offline fallback page i.e.: const offlineFallbackPage = "offline.html";
+const offlineFallbackPage = "offline.html";
 
-// Cache cleanup
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME && cacheName !== DATA_CACHE) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
-  );
-});
-
-// Network-first for API, cache-first for assets
-workbox.routing.registerRoute(
-  new RegExp('/api/'),
-  new workbox.strategies.NetworkFirst({
-    cacheName: DATA_CACHE
-  })
-);
-
-workbox.routing.registerRoute(
-  new RegExp('.(?:js|css|png|jpg|svg)'),
-  new workbox.strategies.CacheFirst({
-    cacheName: CACHE_NAME
-  })
-);
-
-// Offline page for navigation
-workbox.routing.registerRoute(
-  ({request}) => request.mode === 'navigate',
-  async ({event}) => {
-    try {
-      return await workbox.strategies.NetworkFirst().handle({event});
-    } catch (error) {
-      return caches.match(OFFLINE_PAGE);
-    }
-  }
-);
-
-// Background sync for offline data
-self.addEventListener('sync', event => {
-  if (event.tag === 'sync-students') {
-    event.waitUntil(syncPendingStudents());
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
   }
 });
 
-async function syncPendingStudents() {
-  const pending = await getPendingStudents();
-  if (pending.length > 0) {
-    try {
-      await fetch('/api/students', {
-        method: 'POST',
-        body: JSON.stringify(pending),
-        headers: {
-          'Content-Type': 'application/json'
+self.addEventListener('install', async (event) => {
+  event.waitUntil(
+    caches.open(CACHE)
+      .then((cache) => cache.add(offlineFallbackPage))
+  );
+});
+
+if (workbox.navigationPreload.isSupported()) {
+  workbox.navigationPreload.enable();
+}
+
+workbox.routing.registerRoute(
+  new RegExp('/*'),
+  new workbox.strategies.StaleWhileRevalidate({
+    cacheName: CACHE
+  })
+);
+
+self.addEventListener('fetch', (event) => {
+  if (event.request.mode === 'navigate') {
+    event.respondWith((async () => {
+      try {
+        const preloadResp = await event.preloadResponse;
+
+        if (preloadResp) {
+          return preloadResp;
         }
-      });
-      await clearPendingStudents();
-    } catch (error) {
-      console.error('Sync failed:', error);
-    }
+
+        const networkResp = await fetch(event.request);
+        return networkResp;
+      } catch (error) {
+
+        const cache = await caches.open(CACHE);
+        const cachedResp = await cache.match(offlineFallbackPage);
+        return cachedResp;
+      }
+    })());
   }
-}
-
-// Helper functions (would be in your app.js)
-async function getPendingStudents() {
-  const cache = await caches.open(DATA_CACHE);
-  const response = await cache.match('/pending-students');
-  return response ? await response.json() : [];
-}
-
-async function clearPendingStudents() {
-  const cache = await caches.open(DATA_CACHE);
-  await cache.delete('/pending-students');
-}
+});
