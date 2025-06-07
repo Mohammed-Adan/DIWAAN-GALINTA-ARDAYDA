@@ -382,48 +382,51 @@
       color: var(--text-light);
     }
 
-    .payment-status {
-      font-weight: 600;
-      padding: var(--space-xs) var(--space-sm);
-      border-radius: var(--radius-round);
-      font-size: 0.85rem;
-    }
+    /* Payment Status Styles - Light/Dark Mode Compatible */
+.payment-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-round);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+  transition: background 0.3s ease, color 0.3s ease;
+}
 
-    .paid {
-      background-color: rgba(16, 185, 129, 0.1);
-      color: var(--success);
-    }
+/* Light Mode Styles */
+.paid {
+  background: linear-gradient(135deg, var(--success), #34D399);
+  color: white;
+}
 
-    .unpaid {
-      background-color: rgba(239, 68, 68, 0.1);
-      color: var(--danger);
-    }
+.unpaid {
+  background: linear-gradient(135deg, var(--danger), #F87171);
+  color: white;
+}
 
-    .action-buttons {
-      display: flex;
-      gap: var(--space-xs);
-    }
+/* Dark Mode Overrides */
+body.dark-mode .paid {
+  background: linear-gradient(135deg, var(--dm-success), #10B981);
+  color: var(--dm-dark);
+}
 
-    .btn-success {
-      background-color: var(--success);
-      color: white;
-    }
+body.dark-mode .unpaid {
+  background: linear-gradient(135deg, var(--dm-danger), #EF4444);
+  color: var(--dm-dark);
+}
 
-    .btn-danger {
-      background-color: var(--danger);
-      color: white;
-    }
-
-    .btn-warning {
-      background-color: var(--warning);
-      color: white;
-    }
-
-    .btn-success:hover, .btn-danger:hover, .btn-warning:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-sm);
-    }
-
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+  body {
+    padding: var(--space-sm);
+  }
+  
+  .payment-status {
+    font-size: 0.8rem;
+    padding: var(--space-xs) var(--space-sm);
+  }
+}
     .summary-cards {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
