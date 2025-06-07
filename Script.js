@@ -320,3 +320,29 @@ function addStudent() {
   updateSummary();
   nameInput.value = '';
 }
+
+async function addStudent() {
+  const name = document.getElementById('studentName').value.trim();
+  if (!name) return;
+
+  const newStudent = {
+    id: Date.now().toString(),
+    name: name,
+    dateAdded: new Date().toLocaleDateString('so-SO')
+  };
+
+  if (navigator.onLine) {
+    // Online - send to server
+  } else {
+    // Offline - store in cache
+    const pending = await getPendingStudents();
+    pending.push(newStudent);
+    const cache = await caches.open(DATA_CACHE);
+    await cache.put('/pending-students', new Response(JSON.stringify(pending)));
+    
+    // Register sync
+    if ('sync' in self.registration) {
+      await self.registration.sync.register('sync-students');
+    }
+  }
+}
