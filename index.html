@@ -81,6 +81,36 @@
     <script src="Script.js"></script>
 
 
+<script>
+  // Register service worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(registration => {
+          console.log('ServiceWorker registration successful');
+          
+          // Set up periodic sync (for background updates)
+          if ('periodicSync' in registration) {
+            registration.periodicSync.register('update-students', {
+              minInterval: 24 * 60 * 60 * 1000 // 24 hours
+            });
+          }
+        })
+        .catch(err => console.log('ServiceWorker registration failed: ', err));
+    });
+  }
+
+  // Function to sync data when connection returns
+  function syncWhenOnline() {
+    if (navigator.onLine) {
+      navigator.serviceWorker.ready.then(registration => {
+        registration.sync.register('sync-students');
+      });
+    }
+  }
+
+  // Listen for connection changes
+  window.addEventListener('online', syncWhenOnline);
 </script>
 </body>
 </html>
