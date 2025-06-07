@@ -1,1 +1,0 @@
-const offlineFallbackPage = "offline.html";
