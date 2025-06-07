@@ -9,8 +9,8 @@ const PRECACHE_URLS = [
   './index.html',
   './styles.css',
   './Script.js',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
+  './bill.png',
+  './Script.js',
   './manifest.json',       // Your app's manifest file
   './fonts/nunito.woff2',  // If using custom fonts
   './bill.png',     // Your app's logo
