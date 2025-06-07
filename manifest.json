@@ -1,0 +1,28 @@
+{
+  "name": "Liiska Ardayda & Lacag Bixinta",
+  "short_name": "Ardayda",
+  "id": "/",
+  "description": "App fudud oo kuu sahlaya inaad diiwaangeliso ardayda iyo lacagaha ay bixiyeen.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#4F46E5",  // Changed to match your primary color
+  "theme_color": "#4F46E5",       // Changed to match your primary color
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icons/quraan-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"   // Added for better PWA support
+    },
+    {
+      "src": "icons/quraan-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"   // Added for better PWA support
+    }
+  ],
+  "scope": "/",
+  "lang": "so",                   // Added language
+  "dir": "ltr"                    // Added direction
+}
