@@ -13,25 +13,25 @@
   },
   "icons": [
     {
-      "src": "file_00000000e2d461f4bdbe05bca5bda643_conversation_id=6840c0e6-31a0-8006-9bbf-e2c321c8bf44&message_id=ce8751b3-4085-4097-bf7e-1d934b5d07d2.webp",
+      "src": "Icon.jpg",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "file_00000000e2d461f4bdbe05bca5bda643_conversation_id=6840c0e6-31a0-8006-9bbf-e2c321c8bf44&message_id=ce8751b3-4085-4097-bf7e-1d934b5d07d2.webp",
+      "src": "Icon.jpg",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "file_00000000e2d461f4bdbe05bca5bda643_conversation_id=6840c0e6-31a0-8006-9bbf-e2c321c8bf44&message_id=ce8751b3-4085-4097-bf7e-1d934b5d07d2.webp",
+      "src": "Icon.jpg",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "file_00000000e2d461f4bdbe05bca5bda643_conversation_id=6840c0e6-31a0-8006-9bbf-e2c321c8bf44&message_id=ce8751b3-4085-4097-bf7e-1d934b5d07d2.webp",
+      "src": "Icon.jpg",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
