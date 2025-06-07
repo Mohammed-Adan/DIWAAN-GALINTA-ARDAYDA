@@ -273,3 +273,50 @@
     document.getElementById('darkModeToggle').innerHTML = isDark ? 
       '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
   });
+
+// In your main app.js
+const pendingStudents = [];
+
+function savePendingStudent(student) {
+  pendingStudents.push(student);
+  localStorage.setItem('pendingStudents', JSON.stringify(pendingStudents));
+}
+
+function getPendingStudents() {
+  return JSON.parse(localStorage.getItem('pendingStudents')) || [];
+}
+
+function clearPendingStudents() {
+  localStorage.removeItem('pendingStudents');
+}
+
+// Modify your addStudent function to handle offline
+function addStudent() {
+  const nameInput = document.getElementById('studentName');
+  const name = nameInput.value.trim();
+
+  if (!name) {
+    showAlert('Fadlan geli magaca ardayga', 'error');
+    return;
+  }
+
+  const newStudent = {
+    id: Date.now().toString(),
+    name: name,
+    payments: {},
+    dateAdded: new Date().toLocaleDateString('so-SO'),
+    isPending: !navigator.onLine
+  };
+
+  if (!navigator.onLine) {
+    savePendingStudent(newStudent);
+    showAlert('Ardayga waa la diiwaangeliyay, waxa lagu keydin doonaa markaad internetka laheshid', 'warning');
+  } else {
+    students.unshift(newStudent);
+    saveToLocalStorage();
+  }
+
+  renderList();
+  updateSummary();
+  nameInput.value = '';
+}
