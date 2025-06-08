@@ -620,12 +620,12 @@ body.dark-mode .unpaid {
     padding: var(--space-sm) var(--space-md);
     font-size: 0.9rem;
   }
-}
 
 .empty-state {
       text-align: center;
       padding: var(--space-xl) var(--space-lg);
       color: var(--text-light);
+
     .empty-icon {
       font-size: 3.5rem;
       color: var(--primary-light);
