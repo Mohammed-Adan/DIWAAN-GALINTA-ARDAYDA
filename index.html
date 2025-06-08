@@ -6,11 +6,10 @@
   <title>Maamulka Ardayda & Lacagta</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
- 
-   <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
+  
+   <link rel="stylesheet" href="/style.css">
+    <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#4F46E5">
-
 </head>
 <body>
 
@@ -20,7 +19,7 @@
     <div class="logo-icon">
       <i class="fas fa-user-ninja"></i>
     </div>
-    <h1>Maamulka Ardayda & Lacag bixintooda</h1>
+    <h1>Maamulka Ardayda & Lacag bixinta</h1>
   </div>
   
   <button id="darkModeToggle" class="dark-mode-toggle">
@@ -49,7 +48,6 @@
       <i class="fas fa-times-circle"></i> Aan bixin
     </button>
   </div>
-
 <!-- Add to toolbar div after filter-buttons -->
 <div class="data-actions">
   <button class="btn btn-sm" onclick="exportData()">
@@ -59,6 +57,8 @@
     <i class="fas fa-file-import"></i> Soo dejinta
   </button>
 </div>
+</div>
+
 <div class="input-card">
   <div class="input-group">
     <input type="text" id="studentName" class="form-control" placeholder="Geli magaca ardayga...">
@@ -84,14 +84,13 @@
     <div class="summary-label">Lacagta aan Bixin</div>
   </div>
 </div>
-    <script src="Script.js"></script>
-
+    <script src="/Script.js"></script>
 
 <script>
   if (typeof navigator.serviceWorker !== 'undefined') {
     navigator.serviceWorker.register('sw.js')
   }
 </script>
-
+</script>
 </body>
 </html>
