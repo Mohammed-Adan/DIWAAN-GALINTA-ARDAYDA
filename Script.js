@@ -519,3 +519,6 @@ function toggleFab() {
   document.querySelector('.fab-container').classList.toggle('open');
 }
 
+window.addEventListener("load", () => {
+  document.getElementById("loader").style.display = "none";
+});
