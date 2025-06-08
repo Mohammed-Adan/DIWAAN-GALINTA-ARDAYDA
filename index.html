@@ -48,16 +48,6 @@
       <i class="fas fa-times-circle"></i> Aan bixin
     </button>
   </div>
-<!-- Add to toolbar div after filter-buttons -->
-<div class="data-actions">
-  <button class="btn btn-sm" onclick="exportData()">
-    <i class="fas fa-file-export"></i> Dhoofinta
-  </button>
-  <button class="btn btn-sm" onclick="importData()">
-    <i class="fas fa-file-import"></i> Soo dejinta
-  </button>
-</div>
-</div>
 
 <div class="input-card">
   <div class="input-group">
@@ -68,8 +58,27 @@
   </div>
 </div>
 
-<div class="student-list" id="studentList"></div>
+<div class="dropdown-actions" style="margin-bottom: 1rem;">
+  <button class="dropdown-toggle">
+    <i class="fas fa-database"></i>
+    <span>Xogta Ardayda</span>
+    <i class="fas fa-chevron-down"></i>
+  </button>
+  <div class="dropdown-menu">
+    <button class="dropdown-item" onclick="importData()">
+      <i class="fas fa-file-import"></i>
+      Soo Deji Xogta
+    </button>
+    <button class="dropdown-item" onclick="exportData()">
+      <i class="fas fa-file-export"></i>
+      Dhoofi Xogta
+    </button>
+  </div>
+</div>
 
+<!-- Space ayaa ka dhaxeeya hadda -->
+
+<div class="student-list" id="studentList"></div>
 <div class="summary-cards">
   <div class="summary-card">
     <div class="summary-value" id="totalStudents">0</div>
