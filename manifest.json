@@ -13,25 +13,25 @@
   },
   "icons": [
     {
-      "src": "bill53size (1).png",
+      "src": "money53Size (1).png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "bill53size (1).png",
+      "src": "money53Size (1).png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "bill53size (1).png",
+      "src": "money53Size (1).png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "bill53size (1).png",
+      "src": "money53Size (1).png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
