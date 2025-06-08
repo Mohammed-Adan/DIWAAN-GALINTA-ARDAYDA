@@ -57,3 +57,18 @@
   "lang": "so",
   "dir": "ltr"
 }
+{
+  "share_target": {
+    "action": "/share-target",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "files": [
+        {
+          "name": "student_files",
+          "accept": ["image/*", ".pdf", "text/csv"]
+        }
+      ]
+    }
+  }
+}
