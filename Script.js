@@ -274,33 +274,87 @@
       '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
   });
 
-  document.getElementById('jsonFileInput').addEventListener('change', function(event) {
-    const file = event.target.files[0];
-    
-    if (!file) return;
+  
 
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  
+  input.onchange = e => {
+    const file = e.target.files[0];
     const reader = new FileReader();
-
-    reader.onload = function(e) {
+    
+    reader.onload = event => {
       try {
-        const content = JSON.parse(e.target.result);
-        console.log("Faylka waa la akhriyay:", content);
-
-        // Halkan waxaad ku qaban kartaa wixii aad rabto file-ka
-        displayStudents(content); // tusaale
-      } catch (error) {
-        alert("Faylka JSON-ka sax ma aha.");
-        console.error(error);
+        const importedData = JSON.parse(event.target.result);
+        
+        // Validate and normalize the imported data
+        const normalizedStudents = normalizeImportedData(importedData);
+        
+        if (normalizedStudents.length > 0) {
+          if (confirm(`Ma hubtaa inaad rabto inaad ku daro ${normalizedStudents.length} arday oo cusub?`)) {
+            students = [...normalizedStudents, ...students];
+            saveToLocalStorage();
+            renderList();
+            updateSummary();
+            showAlert(`${normalizedStudents.length} arday ayaa loo soo dajiyay si guul leh`, 'success');
+          }
+        } else {
+          showAlert('Faylka aad soo dejisay ma lahan xog macquul ah', 'error');
+        }
+      } catch (err) {
+        showAlert('Khalad ayaa dhacay marka la akhrinayay faylka: ' + err.message, 'error');
       }
     };
-
+    
     reader.readAsText(file);
-  });
+  };
+  
+  input.click();
+}
 
-  function displayStudents(data) {
-    data.forEach(student => {
-      console.log(`Magaca: ${student.name}, Lacagta: ${student.payments["2025-6"].amount}`);
-    });
+// New function to normalize imported data
+function normalizeImportedData(data) {
+  // Handle case where data is not an array
+  if (!Array.isArray(data)) {
+    if (typeof data === 'object' && data.students) {
+      data = data.students; // Handle exports that wrap the array in an object
+    } else {
+      return [];
+    }
   }
 
+  return data.map(student => {
+    // Ensure required fields exist
+    const normalized = {
+      id: student.id || Date.now().toString(),
+      name: student.name || 'Arday aan magac lahayn',
+      payments: student.payments || {},
+      dateAdded: student.dateAdded || new Date().toLocaleDateString('so-SO')
+    };
 
+    // Normalize payments structure if it exists
+    if (student.payments) {
+      normalized.payments = {};
+      for (const [monthKey, paid] of Object.entries(student.payments)) {
+        // Ensure payment values are boolean
+        normalized.payments[monthKey] = Boolean(paid);
+      }
+    }
+
+    return normalized;
+  });
+}
+
+function exportData() {
+  const dataStr = JSON.stringify(students, null, 2);
+  const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+  
+  const exportFileDefaultName = `ardayda-${new Date().toISOString().slice(0,10)}.json`;
+  
+  const linkElement = document.createElement('a');
+  linkElement.setAttribute('href', dataUri);
+  linkElement.setAttribute('download', exportFileDefaultName);
+  linkElement.click();
+}
