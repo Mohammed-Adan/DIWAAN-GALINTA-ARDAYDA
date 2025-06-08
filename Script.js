@@ -274,55 +274,9 @@
       '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
   });
 
-// In your main app.js
-const pendingStudents = [];
-
-function savePendingStudent(student) {
-  pendingStudents.push(student);
-  localStorage.setItem('pendingStudents', JSON.stringify(pendingStudents));
-}
-
-function getPendingStudents() {
-  return JSON.parse(localStorage.getItem('pendingStudents')) || [];
-}
-
-function clearPendingStudents() {
-  localStorage.removeItem('pendingStudents');
-}
-
-// Modify your addStudent function to handle offline
 function addStudent() {
   const nameInput = document.getElementById('studentName');
   const name = nameInput.value.trim();
-
-  if (!name) {
-    showAlert('Fadlan geli magaca ardayga', 'error');
-    return;
-  }
-
-  const newStudent = {
-    id: Date.now().toString(),
-    name: name,
-    payments: {},
-    dateAdded: new Date().toLocaleDateString('so-SO'),
-    isPending: !navigator.onLine
-  };
-
-  if (!navigator.onLine) {
-    savePendingStudent(newStudent);
-    showAlert('Ardayga waa la diiwaangeliyay, waxa lagu keydin doonaa markaad internetka laheshid', 'warning');
-  } else {
-    students.unshift(newStudent);
-    saveToLocalStorage();
-  }
-
-  renderList();
-  updateSummary();
-  nameInput.value = '';
-}
-
-async function addStudent() {
-  const name = document.getElementById('studentName').value.trim();
   if (!name) return;
 
   const newStudent = {
@@ -331,18 +285,30 @@ async function addStudent() {
     dateAdded: new Date().toLocaleDateString('so-SO')
   };
 
-  if (navigator.onLine) {
-    // Online - send to server
-  } else {
-    // Offline - store in cache
-    const pending = await getPendingStudents();
+  if (!navigator.onLine) {
+    const pending = getPendingStudents();
     pending.push(newStudent);
-    const cache = await caches.open(DATA_CACHE);
-    await cache.put('/pending-students', new Response(JSON.stringify(pending)));
-    
-    // Register sync
-    if ('sync' in self.registration) {
-      await self.registration.sync.register('sync-students');
-    }
+    localStorage.setItem('pendingStudents', JSON.stringify(pending));
+    showAlert('Ardayga waa la keydiyay (offline)', 'warning');
+  } else {
+    students.unshift(newStudent);
+    saveToLocalStorage();
+    showAlert('Ardayga waa la diiwaangeliyay', 'success');
   }
+
+  renderList();
+  updateSummary();
+  nameInput.value = '';
 }
+
+
+navigator.serviceWorker.addEventListener('message', event => {
+  if (event.data && event.data.type === 'syncStudents') {
+    const pending = getPendingStudents();
+    for (let student of pending) {
+      // Send to server here...
+      console.log('Sending student to server:', student);
+    }
+    clearPendingStudents();
+  }
+});
