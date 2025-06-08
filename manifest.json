@@ -1,18 +1,61 @@
 {
   "name": "Liiska Ardayda & Lacag Bixinta",
   "short_name": "Diwaanka-ardayda",
+  "id": "/",
+  "description": "App fudud oo kuu sahlaya inaad diiwaangeliso ardayda iyo lacagaha ay bixiyeen.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#4F46E5",
   "theme_color": "#4F46E5",
+  "orientation": "portrait-primary",
+  "launch_handler": {
+    "client_mode": "auto"
+  },
   "icons": [
     {
       "src": "bill.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
+    },
+    {
+      "src": "bill.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "bill.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "bill.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
+  "screenshots": [
+    {
+      "src": "screenshots/screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "Dashboard View"
+    },
+    {
+      "src": "screenshots/screenshot2.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "Student List"
+    }
+  ],
+  "categories": ["education", "business"],
+  "iarc_rating_id": "e84b072d",
+  "scope": "/",
+  "lang": "so",
+  "dir": "ltr",
   "share_target": {
     "action": "/share",
     "method": "POST",
@@ -28,7 +71,5 @@
         }
       ]
     }
-  },
-  "lang": "so",
-  "dir": "ltr"
+  }
 }
