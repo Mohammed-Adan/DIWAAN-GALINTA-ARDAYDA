@@ -515,3 +515,7 @@ function cleanStudentForExport(student) {
   };
 }
 
+function toggleFab() {
+  document.querySelector('.fab-container').classList.toggle('open');
+}
+
