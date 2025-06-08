@@ -274,3 +274,33 @@
       '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
   });
 
+  document.getElementById('jsonFileInput').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+      try {
+        const content = JSON.parse(e.target.result);
+        console.log("Faylka waa la akhriyay:", content);
+
+        // Halkan waxaad ku qaban kartaa wixii aad rabto file-ka
+        displayStudents(content); // tusaale
+      } catch (error) {
+        alert("Faylka JSON-ka sax ma aha.");
+        console.error(error);
+      }
+    };
+
+    reader.readAsText(file);
+  });
+
+  function displayStudents(data) {
+    data.forEach(student => {
+      console.log(`Magaca: ${student.name}, Lacagta: ${student.payments["2025-6"].amount}`);
+    });
+  }
+
+
