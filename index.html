@@ -1,21 +1,19 @@
 <!DOCTYPE html>
 <html lang="so">
 <head> 
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Maamulka Ardayda & Lacagta</title>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-   <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#4F46E5">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#4F46E5" />
 </head>
 <body>
 
 <div class="header">
   <div class="logo">
-    
     <div class="logo-icon">
       <i class="fas fa-user-ninja"></i>
     </div>
@@ -31,7 +29,7 @@
 <div class="toolbar">
   <div class="search-container">
     <i class="fas fa-search search-icon"></i>
-    <input type="text" id="searchInput" class="search-input" placeholder="Raadi ardayga...">
+    <input type="text" id="searchInput" class="search-input" placeholder="Raadi ardayga..." />
   </div>
   <div class="month-selector">
     <i class="fas fa-calendar-alt"></i>
@@ -48,14 +46,16 @@
       <i class="fas fa-times-circle"></i> Aan bixin
     </button>
   </div>
+</div>
 
 <div class="input-card">
   <div class="input-group">
-    <input type="text" id="studentName" class="form-control" placeholder="Geli magaca ardayga...">
+    <input type="text" id="studentName" class="form-control" placeholder="Geli magaca ardayga..." />
     <button class="btn btn-primary" onclick="addStudent()">
       <i class="fas fa-plus"></i> Ku dar Ardayga
     </button>
   </div>
+</div>
 
 <div class="dropdown-actions" style="margin-bottom: 1rem;">
   <button class="dropdown-toggle">
@@ -75,9 +75,8 @@
   </div>
 </div>
 
-<!-- Space ayaa ka dhaxeeya hadda -->
-
 <div class="student-list" id="studentList"></div>
+
 <div class="summary-cards">
   <div class="summary-card">
     <div class="summary-value" id="totalStudents">0</div>
@@ -92,13 +91,16 @@
     <div class="summary-label">Lacagta aan Bixin</div>
   </div>
 </div>
-    <script src="Script.js"></script>
+
+<script src="Script.js"></script>
 
 <script>
   if (typeof navigator.serviceWorker !== 'undefined') {
     navigator.serviceWorker.register('sw.js')
+      .then(() => console.log('Service Worker Registered'))
+      .catch(err => console.log('Service Worker registration failed:', err));
   }
 </script>
-</script>
+
 </body>
 </html>
