@@ -515,12 +515,3 @@ function cleanStudentForExport(student) {
   };
 }
 
-function resetStudentData() {
-  if (confirm('Ma hubtaa inaad dib u dejisid dhammaan xogta ardayda?\nTani waxay lumin doontaa dhammaan xogtaada!')) {
-    localStorage.setItem('students', JSON.stringify([]));
-    location.reload(); // Refresh the page
-  }
-}
-
-// Run this to reset:
-resetStudentData();
