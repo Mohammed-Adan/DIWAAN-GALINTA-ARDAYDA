@@ -773,8 +773,7 @@ body.dark-mode .dropdown-item:hover {
   to { transform: rotate(360deg); }
 }
 
-<!-- Add this CSS to your style.css -->
-<style>
+
   .logo-editor-wrapper {
     position: relative;
     margin-bottom: var(--space-lg);
