@@ -980,3 +980,16 @@ body.dark-mode .school-tagline {
       outline: none;
     } 
 }
+
+.month-selector {
+  max-width: 200px; /* Ama width: 150px; sida aad rabto */
+}
+
+.month-selector select {
+  width: 85%; /* si ay ugu dhex shaqeyso xadka gaaban */
+  padding: var(--space-sm); /* yarayn padding haddii aad rabto */
+  font-size: 0.9rem; /* yarayn font size haddii loo baahdo */
+}
+.month-selector select {
+  padding: 2px 10px;
+}
