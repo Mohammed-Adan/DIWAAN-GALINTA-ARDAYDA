@@ -947,3 +947,59 @@ body.dark-mode .school-tagline {
     font-size: 1.8rem;
   }
 }
+
+.logo-editor-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-lg);
+}
+
+.logo-display {
+  display: inline-block;
+  padding: 0 var(--space-md);
+}
+
+.text-logo {
+  display: block;
+  text-align: center;
+  width: 100%;
+}
+
+.school-name {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  display: block;
+  line-height: 1;
+}
+
+.school-tagline {
+  font-size: 1rem;
+  color: var(--text-light);
+  display: block;
+  margin-top: var(--space-xs);
+}
+
+/* Dark mode */
+body.dark-mode .school-name {
+  color: var(--dm-primary);
+}
+
+body.dark-mode .school-tagline {
+  color: var(--dm-text-light);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .school-name {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .school-name {
+    font-size: 1.8rem;
+  }
+}
