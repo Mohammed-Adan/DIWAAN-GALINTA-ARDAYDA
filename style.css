@@ -217,29 +217,7 @@
       color: var(--text-light);
     }
 
-    .month-selector {
-      display: flex;
-      align-items: center;
-      gap: var(--space-sm);
-      background-color: var(--card-bg);
-      padding: var(--space-sm) var(--space-md);
-      border-radius: var(--radius-round);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .month-selector select {
-      border: none;
-      background: transparent;
-      font-family: 'Nunito', sans-serif;
-      font-weight: 600;
-      color: var(--text);
-      cursor: pointer;
-    }
-
-    .month-selector select:focus {
-      outline: none;
-    }
-
+   
     .filter-buttons {
       display: flex;
       gap: var(--space-sm);
@@ -465,36 +443,36 @@
     }
 @media (max-width: 768px) {
   /* Existing styles... */
-  
+
   /* Add these */
   .summary-cards {
     grid-template-columns: 1fr;
   }
-  
 
-  
+
+
   .filter-buttons {
     overflow-x: auto;
     padding-bottom: var(--space-sm);
     width: 100%;
   }
-  
+
   .filter-btn {
     white-space: nowrap;
   }
-  
+
   .student-item {
     position: relative;
     padding-left: var(--space-md);
   }
-  
+
   .payment-status {
     position: absolute;
     top: var(--space-sm);
     right: var(--space-sm);
     font-size: 0.7rem;
   }
-  
+
   .action-buttons {
     margin-top: var(--space-sm);
     width: 100%;
@@ -502,61 +480,12 @@
   }
 }
 @media (max-width: 768px) {
-  .month-selector {
-    flex-direction: column;
-    align-items: stretch; /* Changed from flex-start for better alignment */
-    gap: var(--space-sm);
-    width: 100%;
-    background-color: var(--card-bg);
-    padding: var(--space-md);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
-    margin-bottom: var(--space-sm);
-  }
-
-  .month-selector select {
-    width: 100%;
-    padding: var(--space-md);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    background-color: var(--card-bg);
-    color: var(--text);
-    font-size: 1rem;
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right var(--space-md) center;
-    background-size: 1rem;
-  }
-
-  .month-selector select:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
-  }
-
-  /* Dark mode styles */
-  body.dark-mode .month-selector {
-    background-color: var(--dm-card-bg);
-  }
-
-  body.dark-mode .month-selector select {
-    background-color: var(--dm-card-bg);
-    color: var(--dm-text);
-    border-color: var(--dm-border);
-  }
-}
 
 /* Additional improvements for very small screens */
 @media (max-width: 480px) {
-  .month-selector {
-    padding: var(--space-sm);
-  }
+  
 
-  .month-selector select {
-    padding: var(--space-sm) var(--space-md);
-    font-size: 0.9rem;
-  }
+
 }
 /* Payment Status Styles - Light/Dark Mode Compatible */
 .payment-status {
@@ -597,7 +526,7 @@ body.dark-mode .unpaid {
   body {
     padding: var(--space-sm);
   }
-  
+
   .payment-status {
     font-size: 0.8rem;
     padding: var(--space-xs) var(--space-sm);
@@ -607,15 +536,15 @@ body.dark-mode .unpaid {
     flex-direction: column;
     text-align: center;
   }
-  
+
   h1 {
     font-size: 1.5rem;
   }
-  
+
   .input-card {
     padding: var(--space-md);
   }
-  
+
   .btn {
     padding: var(--space-sm) var(--space-md);
     font-size: 0.9rem;
@@ -1002,4 +931,52 @@ body.dark-mode .school-tagline {
   .school-name {
     font-size: 1.8rem;
   }
+}
+
+    /* Month selector */
+    .month-selector {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      background-color: var(--card-bg);
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-round);
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+    
+    body.dark-mode .month-selector {
+      background-color: var(--dm-card-bg);
+    }
+    
+    .month-selector i {
+      color: var(--primary);
+    }
+    
+    body.dark-mode .month-selector i {
+      color: var(--dm-primary);
+    }
+    
+    .month-selector select {
+      border: none;
+      background: transparent;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      appearance: none;
+      padding-right: var(--space-md);
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right center;
+      background-size: 16px;
+    }
+    
+    body.dark-mode .month-selector select {
+      color: var(--dm-text);
+    }
+    
+    .month-selector select:focus {
+      outline: none;
+    } 
 }
