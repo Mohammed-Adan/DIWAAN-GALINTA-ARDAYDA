@@ -27,7 +27,285 @@
   </button>
   <p class="subtitle">Diiwaangelinta ardayda iyo xogta lacag bixintooda si fudud oo sax ah</p>
 </div>
+<!-- Add this at the top of your body content -->
+<div class="logo-editor-wrapper">
+  <div class="logo-display">
+    <div class="text-logo">
+      <span class="school-name" id="displaySchoolName">MADARSA</span>
+      <span class="school-tagline" id="displaySchoolTagline">Al-Huda Academy</span>
+    </div>
+    <div class="logo-actions">
+      <button class="icon-btn logo-edit-btn" id="editLogoBtn" title="Edit Logo">
+        <i class="fas fa-pen"></i>
+      </button>
+      <button class="icon-btn logo-copy-btn" id="copyLogoBtn" title="Copy Logo Text">
+        <i class="fas fa-copy"></i>
+      </button>
+    </div>
+  </div>
 
+  <!-- Edit Modal (hidden by default) -->
+  <div class="logo-edit-modal" id="logoEditModal">
+    <div class="modal-content">
+      <h3>Customize School Logo</h3>
+      <div class="form-group">
+        <label for="schoolNameInput">School Name</label>
+        <input type="text" id="schoolNameInput" class="form-control" maxlength="30">
+      </div>
+      <div class="form-group">
+        <label for="schoolTaglineInput">Tagline (Optional)</label>
+        <input type="text" id="schoolTaglineInput" class="form-control" maxlength="50">
+      </div>
+      <div class="form-group">
+        <label>Preview:</label>
+        <div class="logo-preview">
+          <span class="school-name" id="previewSchoolName"></span>
+          <span class="school-tagline" id="previewSchoolTagline"></span>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="cancelLogoEdit">Cancel</button>
+        <button class="btn btn-primary" id="saveLogoChanges">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add this CSS to your style.css -->
+<style>
+  .logo-editor-wrapper {
+    position: relative;
+    margin-bottom: var(--space-lg);
+    text-align: center;
+  }
+
+  .logo-display {
+    position: relative;
+    display: inline-block;
+    padding: 0 var(--space-md);
+  }
+
+  .logo-actions {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    gap: var(--space-xs);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .logo-display:hover .logo-actions {
+    opacity: 1;
+  }
+
+  .icon-btn {
+    background: var(--bg-light);
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-light);
+    transition: all 0.2s ease;
+  }
+
+  .icon-btn:hover {
+    background: var(--primary);
+    color: white;
+    transform: scale(1.1);
+  }
+
+  .logo-edit-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-content {
+    background: var(--bg-light);
+    padding: var(--space-lg);
+    border-radius: var(--border-radius-lg);
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    animation: modalFadeIn 0.3s ease;
+  }
+
+  @keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .form-group {
+    margin-bottom: var(--space-md);
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: var(--space-xs);
+    color: var(--text-light);
+    font-size: 0.9rem;
+  }
+
+  .logo-preview {
+    padding: var(--space-md);
+    background: rgba(0,0,0,0.05);
+    border-radius: var(--border-radius);
+    margin-top: var(--space-sm);
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-md);
+    margin-top: var(--space-lg);
+  }
+
+  /* Dark mode adjustments */
+  body.dark-mode .modal-content {
+    background: var(--dm-bg-light);
+  }
+
+  body.dark-mode .form-group label {
+    color: var(--dm-text-light);
+  }
+
+  body.dark-mode .logo-preview {
+    background: rgba(255,255,255,0.05);
+  }
+
+  body.dark-mode .icon-btn {
+    background: var(--dm-bg-light);
+    color: var(--dm-text-light);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .modal-content {
+      padding: var(--space-md);
+    }
+    
+    .modal-actions {
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+    
+    .modal-actions button {
+      width: 100%;
+    }
+  }
+</style>
+
+<!-- Add this JavaScript to your Script.js -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // DOM Elements
+    const editBtn = document.getElementById('editLogoBtn');
+    const copyBtn = document.getElementById('copyLogoBtn');
+    const modal = document.getElementById('logoEditModal');
+    const cancelBtn = document.getElementById('cancelLogoEdit');
+    const saveBtn = document.getElementById('saveLogoChanges');
+    const nameInput = document.getElementById('schoolNameInput');
+    const taglineInput = document.getElementById('schoolTaglineInput');
+    const previewName = document.getElementById('previewSchoolName');
+    const previewTagline = document.getElementById('previewSchoolTagline');
+    const displayName = document.getElementById('displaySchoolName');
+    const displayTagline = document.getElementById('displaySchoolTagline');
+
+    // Load saved logo if exists
+    const savedName = localStorage.getItem('schoolName');
+    const savedTagline = localStorage.getItem('schoolTagline');
+    
+    if (savedName) displayName.textContent = savedName;
+    if (savedTagline) displayTagline.textContent = savedTagline;
+
+    // Edit button click handler
+    editBtn.addEventListener('click', function() {
+      nameInput.value = displayName.textContent;
+      taglineInput.value = displayTagline.textContent || '';
+      updatePreview();
+      modal.style.display = 'flex';
+      nameInput.focus();
+    });
+
+    // Copy button click handler
+    copyBtn.addEventListener('click', function() {
+      const textToCopy = `${displayName.textContent}\n${displayTagline.textContent}`;
+      navigator.clipboard.writeText(textToCopy)
+        .then(() => {
+          // Show temporary feedback
+          const originalHtml = copyBtn.innerHTML;
+          copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+          setTimeout(() => {
+            copyBtn.innerHTML = originalHtml;
+          }, 2000);
+        })
+        .catch(err => console.error('Failed to copy: ', err));
+    });
+
+    // Cancel button click handler
+    cancelBtn.addEventListener('click', function() {
+      modal.style.display = 'none';
+    });
+
+    // Save button click handler
+    saveBtn.addEventListener('click', function() {
+      const newName = nameInput.value.trim();
+      const newTagline = taglineInput.value.trim();
+
+      if (!newName) {
+        alert('Please enter a school name');
+        return;
+      }
+
+      // Update display
+      displayName.textContent = newName;
+      displayTagline.textContent = newTagline;
+
+      // Save to localStorage
+      localStorage.setItem('schoolName', newName);
+      localStorage.setItem('schoolTagline', newTagline);
+
+      // Hide modal
+      modal.style.display = 'none';
+    });
+
+    // Update preview as user types
+    nameInput.addEventListener('input', updatePreview);
+    taglineInput.addEventListener('input', updatePreview);
+
+    // Close modal when clicking outside
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && modal.style.display === 'flex') {
+        modal.style.display = 'none';
+      }
+    });
+
+    // Helper function to update preview
+    function updatePreview() {
+      previewName.textContent = nameInput.value.trim() || 'MADARSA';
+      previewTagline.textContent = taglineInput.value.trim() || 'Al-Huda Academy';
+    }
+  });
+</script>
 <div class="toolbar">
   <div class="search-container">
     <i class="fas fa-search search-icon"></i>
