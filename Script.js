@@ -479,3 +479,37 @@ function addStudent() {
 
   showToast('Student added successfully', 'success');
 }
+
+function addStudent() {
+  const nameInput = document.getElementById('studentName');
+  const name = nameInput.value.trim();
+
+  if (!name) {
+    showToast('Please enter student name', 'error');
+    return;
+  }
+
+  // 1. Add student to list
+  const newStudent = {
+    id: Date.now().toString(),
+    name: name,
+    payments: {},
+    dateAdded: new Date().toLocaleDateString('so-SO')
+  };
+  students.unshift(newStudent);
+  saveToLocalStorage();
+  renderList();
+
+  // 2. Clear the input field
+  nameInput.value = '';
+
+  // 3. Hide the keyboard (two methods)
+  
+  // METHOD 1: Blur the input (most reliable)
+  nameInput.blur(); // This makes the keyboard disappear
+
+  // METHOD 2: Switch focus to another element
+  // document.getElementById('someOtherElement').focus();
+  
+  showToast('Student added successfully', 'success');
+}
