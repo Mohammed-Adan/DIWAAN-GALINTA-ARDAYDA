@@ -1,524 +1,455 @@
-  // Main App Data
-  let students = JSON.parse(localStorage.getItem('students')) || [];
-  let editingId = null;
-  let currentFilter = 'all';
-  let currentSearch = '';
-  let currentMonth = new Date().getMonth() + 1;
-  let currentYear = new Date().getFullYear();
+    // Main App Data
+    let students = JSON.parse(localStorage.getItem('students')) || [];
+    let editingId = null;
+    let currentFilter = 'all';
+    let currentSearch = '';
+    let currentMonth = new Date().getMonth() + 1;
+    let currentYear = new Date().getFullYear();
+    const monthlyFee = 50; // Default monthly fee in dollars
 
-  const monthNames = [
-    "Janaayo", "Febraayo", "Maarso", "Abriil", 
-    "May", "Juun", "Luuliyo", "Agoosto", 
-    "Sebtembar", "Oktoobar", "Nofembar", "Desembar"
-  ];
+    const monthNames = [
+      "Janaayo", "Febraayo", "Maarso", "Abriil", 
+      "May", "Juun", "Luuliyo", "Agoosto", 
+      "Sebtembar", "Oktoobar", "Nofembar", "Desembar"
+    ];
 
-  // Initialize App
-  document.addEventListener('DOMContentLoaded', () => {
-    initializeMonthSelector();
-    setupEventListeners();
-    renderList();
-    updateSummary();
-    initDarkMode();
-  });
-
-  function initializeMonthSelector() {
-    const monthSelect = document.getElementById('monthSelect');
-    monthSelect.innerHTML = '';
-    
-    // Add months
-    monthNames.forEach((month, index) => {
-      const option = document.createElement('option');
-      option.value = index + 1;
-      option.textContent = month;
-      if (index + 1 === currentMonth) option.selected = true;
-      monthSelect.appendChild(option);
+    // Initialize App
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeSelectors();
+      setupEventListeners();
+      renderList();
+      updateSummary();
+      initDarkMode();
+      updateProgressBar();
     });
-    
-    // Add year selector
-    const yearSelect = document.createElement('select');
-    for (let y = currentYear; y >= currentYear - 5; y--) {
-      const option = document.createElement('option');
-      option.value = y;
-      option.textContent = y;
-      yearSelect.appendChild(option);
+
+    function initializeSelectors() {
+      const monthSelect = document.getElementById('monthSelect');
+      const yearSelect = document.getElementById('yearSelect');
+      
+      // Initialize month selector
+      monthSelect.innerHTML = '';
+      monthNames.forEach((month, index) => {
+        const option = document.createElement('option');
+        option.value = index + 1;
+        option.textContent = month;
+        if (index + 1 === currentMonth) option.selected = true;
+        monthSelect.appendChild(option);
+      });
+      
+      // Initialize year selector
+      yearSelect.innerHTML = '';
+      for (let y = currentYear + 1; y >= currentYear - 5; y--) {
+        const option = document.createElement('option');
+        option.value = y;
+        option.textContent = y;
+        if (y === currentYear) option.selected = true;
+        yearSelect.appendChild(option);
+      }
+
+      // Event listeners
+      monthSelect.addEventListener('change', (e) => {
+        currentMonth = parseInt(e.target.value);
+        renderList();
+        updateProgressBar();
+      });
+
+      yearSelect.addEventListener('change', (e) => {
+        currentYear = parseInt(e.target.value);
+        renderList();
+        updateProgressBar();
+      });
     }
-    yearSelect.value = currentYear;
-    document.querySelector('.month-selector').appendChild(yearSelect);
 
-    // Event listeners
-    monthSelect.addEventListener('change', (e) => {
-      currentMonth = parseInt(e.target.value);
-      renderList();
-    });
-
-    yearSelect.addEventListener('change', (e) => {
-      currentYear = parseInt(e.target.value);
-      renderList();
-    });
-  }
-
-  function setupEventListeners() {
-    // Search input
-    document.getElementById('searchInput').addEventListener('input', (e) => {
-      currentSearch = e.target.value.toLowerCase();
-      renderList();
-    });
-
-    // Filter buttons
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        currentFilter = btn.dataset.filter;
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+    function setupEventListeners() {
+      // Search input
+      document.getElementById('searchInput').addEventListener('input', (e) => {
+        currentSearch = e.target.value.toLowerCase();
         renderList();
       });
-    });
 
-    // Add student on Enter key
-    document.getElementById('studentName').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') addStudent();
-    });
-  }
+      // Filter buttons
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentFilter = btn.dataset.filter;
+          document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderList();
+        });
+      });
 
-  // Student CRUD Operations
-  function addStudent() {
-    const nameInput = document.getElementById('studentName');
-    const name = nameInput.value.trim();
+      // Add student button
+      document.getElementById('addStudentBtn').addEventListener('click', addStudent);
 
-    if (!name) {
-      alert('Fadlan geli magaca ardayga');
-      return;
+      // Add student on Enter key
+      document.getElementById('studentName').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') addStudent();
+      });
+
+      // Help FAB
+      document.getElementById('helpFab').addEventListener('click', () => {
+        document.querySelector('.help-box').scrollIntoView({ behavior: 'smooth' });
+      });
     }
 
-    if (editingId === null) {
-      // Add new student
-      const newStudent = {
-        id: Date.now().toString(),
-        name: name,
-        payments: {},
-        dateAdded: new Date().toLocaleDateString('so-SO')
-      };
-      students.unshift(newStudent);
-      saveToLocalStorage();
-      renderList();
-      updateSummary();
-      
-      // Highlight new student
-      const newStudentEl = document.querySelector(`[data-id="${newStudent.id}"]`);
-      if (newStudentEl) {
-        newStudentEl.classList.add('new');
-        setTimeout(() => newStudentEl.classList.remove('new'), 3000);
-      }
-    } else {
-      // Update existing student
-      const studentIndex = students.findIndex(s => s.id === editingId);
-      if (studentIndex !== -1) {
-        students[studentIndex].name = name;
-        saveToLocalStorage();
-        renderList();
-      }
-      cancelEdit();
-    }
-
-    nameInput.value = '';
-  }
-
-  function togglePayment(studentId) {
-    const student = students.find(s => s.id === studentId);
-    if (student) {
+    function updateProgressBar() {
       const monthKey = `${currentYear}-${currentMonth}`;
-      if (!student.payments) student.payments = {};
-      student.payments[monthKey] = !student.payments[monthKey];
-      saveToLocalStorage();
-      renderList();
-      updateSummary();
-    }
-  }
-
-  function editStudent(studentId) {
-    const student = students.find(s => s.id === studentId);
-    if (student) {
-      editingId = studentId;
-      document.getElementById('studentName').value = student.name;
-      document.getElementById('studentName').focus();
-      document.querySelector('.btn-primary i').className = 'fas fa-save';
-      document.querySelector('.btn-primary').innerHTML = '<i class="fas fa-save"></i> Kaydi Isbedelka';
-    }
-  }
-
-  function cancelEdit() {
-    editingId = null;
-    document.getElementById('studentName').value = '';
-    document.querySelector('.btn-primary i').className = 'fas fa-plus';
-    document.querySelector('.btn-primary').innerHTML = '<i class="fas fa-plus"></i> Ku dar Arday';
-  }
-
-  function deleteStudent(studentId) {
-    if (!confirm('Ma hubtaa inaad rabto inaad tirtirto?')) return;
-    
-    const studentIndex = students.findIndex(s => s.id === studentId);
-    if (studentIndex !== -1) {
-      students.splice(studentIndex, 1);
-      saveToLocalStorage();
-      renderList();
-      updateSummary();
-      if (editingId === studentId) cancelEdit();
-    }
-  }
-
-  // UI Rendering
-  function renderList() {
-    const container = document.getElementById('studentList');
-    const filteredStudents = filterStudents();
-
-    if (!filteredStudents.length) {
-      container.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-icon">
-            <i class="fas fa-user-graduate"></i>
-          </div>
-          <h3 class="empty-title">${currentSearch ? 'Wax arday ah lama helin' : 'Ma jiraan arday diiwaangashan'}</h3>
-          <p>${currentSearch ? 'Hmmm.. lama helin wax arday ah' : 'Ku dar ardayda adiga oo isticmaalaya foomka kor'}</p>
-        </div>
-      `;
-      return;
+      const paidCount = students.filter(s => s.payments && s.payments[monthKey]).length;
+      const totalStudents = students.length;
+      const percentage = totalStudents > 0 ? Math.round((paidCount / totalStudents) * 100) : 0;
+      
+      const progressBar = document.getElementById('progressBar');
+      progressBar.style.width = `${percentage}%`;
+      progressBar.title = `${percentage}% lacag bixi (${paidCount}/${totalStudents})`;
     }
 
-    container.innerHTML = '';
-    filteredStudents.forEach(student => {
-      const studentEl = document.createElement('div');
-      studentEl.className = 'student-item';
-      studentEl.setAttribute('data-id', student.id);
+    // Student CRUD Operations
+    function addStudent() {
+      const nameInput = document.getElementById('studentName');
+      const name = nameInput.value.trim();
 
-      const monthKey = `${currentYear}-${currentMonth}`;
-      const hasPaid = student.payments && student.payments[monthKey];
-      
-      studentEl.innerHTML = `
-  <div class="student-info">
-    <div class="student-avatar">${student.name.charAt(0).toUpperCase()}</div>
-    <div class="student-details">
-      <div class="student-name">${student.name}</div>
-      <div class="student-date">${student.dateAdded}</div>
-    </div>
-  </div>
-  <div style="display: flex; align-items: center; gap: var(--space-sm);">
-    <span class="payment-status ${hasPaid ? 'paid' : 'unpaid'}">
-      ${monthNames[currentMonth-1]}: ${hasPaid ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-times-circle"></i>'}
-    </span>
-    <div class="action-buttons">
-      <button class="btn btn-sm ${hasPaid ? 'btn-danger' : 'btn-success'}" 
-              onclick="togglePayment('${student.id}')">
-        <i class="fas ${hasPaid ? 'fa-times' : 'fa-check'}"></i>
-      </button>
-      <button class="btn btn-sm btn-warning" 
-              onclick="editStudent('${student.id}')">
-        <i class="fas fa-edit"></i>
-      </button>
-      <button class="btn btn-sm btn-danger" 
-              onclick="deleteStudent('${student.id}')">
-        <i class="fas fa-trash"></i>
-      </button>
-    </div>
-  </div>
-`;
-      container.appendChild(studentEl);
-    });
-  }
-
-  // Utility Functions
-  function filterStudents() {
-    const monthKey = `${currentYear}-${currentMonth}`;
-    return students.filter(student => {
-      const matchesSearch = !currentSearch || 
-        student.name.toLowerCase().includes(currentSearch);
-      
-      const paymentStatus = student.payments && student.payments[monthKey];
-      const matchesFilter = currentFilter === 'all' ||
-        (currentFilter === 'paid' && paymentStatus) ||
-        (currentFilter === 'unpaid' && !paymentStatus);
-      
-      return matchesSearch && matchesFilter;
-    });
-  }
-
-  function updateSummary() {
-    const monthKey = `${currentYear}-${currentMonth}`;
-    const paidCount = students.filter(s => s.payments && s.payments[monthKey]).length;
-    
-    document.getElementById('totalStudents').textContent = students.length;
-    document.getElementById('paidStudents').textContent = paidCount;
-    document.getElementById('unpaidStudents').textContent = students.length - paidCount;
-  }
-
-  function saveToLocalStorage() {
-    localStorage.setItem('students', JSON.stringify(students));
-  }
-
-  // Dark Mode Functions
-  function initDarkMode() {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const darkMode = localStorage.getItem('darkMode');
-    
-    if (darkMode === 'enabled' || (!darkMode && prefersDark)) {
-      document.body.classList.add('dark-mode');
-      document.getElementById('darkModeToggle').innerHTML = '<i class="fas fa-sun"></i>';
-    }
-  }
-  
-
-  document.getElementById('darkModeToggle').addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains('dark-mode');
-    localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
-    document.getElementById('darkModeToggle').innerHTML = isDark ? 
-      '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-  });
-
-  
-
-// ======================
-// IMPORT/EXPORT FUNCTIONS
-// ======================
-
-/**
- * Handles importing student data from JSON files
- * with validation, normalization, and duplicate prevention
- */
-function importData() {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '.json';
-  
-  input.onchange = async e => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    try {
-      const importedData = await readFile(file);
-      const normalizedStudents = normalizeImportedData(importedData);
-      
-      if (normalizedStudents.length === 0) {
-        throw new Error('Faylka ma lahan ardayo sax ah');
-      }
-
-      const { newStudents, duplicateCount } = filterDuplicates(normalizedStudents);
-      
-      if (newStudents.length === 0) {
-        showAlert('Dhammaan ardayda ayaa hore u jiray', 'info');
+      if (!name) {
+        showToast('Fadlan geli magaca ardayga', 'error');
         return;
       }
 
-      const confirmed = await showImportConfirmation(newStudents.length, duplicateCount);
-      if (!confirmed) return;
-
-      mergeStudents(newStudents);
-      showAlert(`Ku daray ${newStudents.length} arday oo cusub`, 'success');
-      
-    } catch (err) {
-      showAlert(`Khalad: ${err.message}`, 'error');
-      console.error('Import error:', err);
-    }
-  };
-  
-  input.click();
-}
-
-/**
- * Exports current student data to JSON file
- */
-function exportData() {
-  try {
-    const exportData = {
-      meta: {
-        exportedAt: new Date().toISOString(),
-        system: "Student Management System",
-        version: "1.0"
-      },
-      students: students.map(cleanStudentForExport)
-    };
-
-    const dataStr = JSON.stringify(exportData, null, 2);
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `ardayda-export-${new Date().toISOString().slice(0,10)}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-  } catch (err) {
-    showAlert(`Khalad marka la sameeyay export: ${err.message}`, 'error');
-  }
-}
-
-// ======================
-// HELPER FUNCTIONS
-// ======================
-
-/**
- * Reads file content as text
- */
-function readFile(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = e => resolve(e.target.result);
-    reader.onerror = e => reject(new Error('Qalad akhriska faylka'));
-    reader.readAsText(file);
-  });
-}
-
-/**
- * Normalizes imported student data to consistent format
- */
-function normalizeImportedData(data) {
-  try {
-    // Parse if string
-    if (typeof data === 'string') {
-      data = JSON.parse(data);
-    }
-
-    // Extract students array if wrapped in object
-    if (data && typeof data === 'object' && !Array.isArray(data) && data.students) {
-      data = data.students;
-    }
-
-    // Ensure we have an array
-    if (!Array.isArray(data)) {
-      throw new Error('Foomka xogta ma ahan mid sax ah');
-    }
-
-    return data
-      .map(student => {
-        // Skip invalid entries
-        if (!student || typeof student !== 'object') return null;
-        
-        // Generate stable ID if missing
-        const id = student.id || generateStudentId(student);
-        
-        // Normalize payments
-        const payments = normalizePayments(student.payments);
-        
-        return {
-          id,
-          name: String(student.name || 'Arday aan magac lahayn'),
-          payments,
-          dateAdded: student.dateAdded || new Date().toISOString(),
-          _source: 'imported',
-          _importedAt: new Date().toISOString()
+      if (editingId === null) {
+        // Add new student
+        const newStudent = {
+          id: Date.now().toString(),
+          name: name,
+          payments: {},
+          dateAdded: new Date().toLocaleDateString('so-SO', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })
         };
-      })
-      .filter(Boolean); // Remove any null entries
-  } catch (err) {
-    throw new Error(`Qalad habaynta xogta: ${err.message}`);
-  }
-}
+        students.unshift(newStudent);
+        saveToLocalStorage();
+        renderList();
+        updateSummary();
+        updateProgressBar();
+        
+        // Highlight new student
+        const newStudentEl = document.querySelector(`[data-id="${newStudent.id}"]`);
+        if (newStudentEl) {
+          newStudentEl.classList.add('new');
+          setTimeout(() => newStudentEl.classList.remove('new'), 3000);
+        }
+        
+    
+      } else {
+        // Update existing student
+        const studentIndex = students.findIndex(s => s.id === editingId);
+        if (studentIndex !== -1) {
+          students[studentIndex].name = name;
+          saveToLocalStorage();
+          renderList();
+          showToast('Magaca ardayga waa la cusboonaysiiyay', 'success');
+        }
+        cancelEdit();
+      }
 
-/**
- * Generates a stable ID for imported students
- */
-function generateStudentId(student) {
-  const namePart = student.name 
-    ? student.name.trim().toLowerCase().replace(/\s+/g, '-').slice(0, 20)
-    : 'anonymous';
-  const randomPart = Math.random().toString(36).slice(2, 8);
-  return `imported-${namePart}-${randomPart}`;
-}
+      nameInput.value = '';
+      nameInput.focus();
+    }
 
-/**
- * Normalizes payments object structure
- */
-function normalizePayments(payments) {
-  const normalized = {};
-  
-  if (payments && typeof payments === 'object') {
-    for (const [key, value] of Object.entries(payments)) {
-      // Only include valid month-year keys and boolean values
-      if (/^\d{4}-(0[1-9]|1[0-2])$/.test(key)) {
-        normalized[key] = Boolean(value);
+    function togglePayment(studentId) {
+      const student = students.find(s => s.id === studentId);
+      if (student) {
+        const monthKey = `${currentYear}-${currentMonth}`;
+        if (!student.payments) student.payments = {};
+        student.payments[monthKey] = !student.payments[monthKey];
+        saveToLocalStorage();
+        renderList();
+        updateSummary();
+        updateProgressBar();
+        
+        const status = student.payments[monthKey] ? 'Bixiyay' : 'Aan bixin';
+        
       }
     }
-  }
-  
-  return normalized;
-}
 
-/**
- * Filters out duplicate students
- */
-function filterDuplicates(newStudents) {
-  const existingIds = new Set(students.map(s => s.id));
-  const duplicates = new Set();
-  
-  const uniqueStudents = newStudents.filter(student => {
-    if (existingIds.has(student.id)) {
-      duplicates.add(student.id);
-      return false;
+    function editStudent(studentId) {
+      const student = students.find(s => s.id === studentId);
+      if (student) {
+        editingId = studentId;
+        const nameInput = document.getElementById('studentName');
+        nameInput.value = student.name;
+        nameInput.focus();
+        
+        const addBtn = document.getElementById('addStudentBtn');
+        addBtn.innerHTML = '<i class="fas fa-save"></i> Kaydi Isbedelka';
+        addBtn.classList.add('btn-info');
+        addBtn.classList.remove('btn-primary');
+      }
     }
-    return true;
-  });
-  
-  return {
-    newStudents: uniqueStudents,
-    duplicateCount: duplicates.size
-  };
-}
 
-/**
- * Shows import confirmation dialog with stats
- */
-async function showImportConfirmation(newCount, duplicateCount) {
-  return new Promise(resolve => {
-    const message = [
-      `Waxaad rabtaa inaad ku dartid ${newCount} arday oo cusub?`,
-      duplicateCount > 0 && `${duplicateCount} arday ayaa la diiday, waayo horey ayay igu jireen liiskaaga(duplicates)`
-    ].filter(Boolean).join('\n\n');
+    function cancelEdit() {
+      editingId = null;
+      document.getElementById('studentName').value = '';
+      
+      const addBtn = document.getElementById('addStudentBtn');
+      addBtn.innerHTML = '<i class="fas fa-plus"></i> Ku dar Ardayga';
+      addBtn.classList.add('btn-primary');
+      addBtn.classList.remove('btn-info');
+    }
+
+    function deleteStudent(studentId) {
+      if (!confirm('Ma hubtaa inaad rabto inaad tirtirto ardaygan?')) return;
+      
+      const studentIndex = students.findIndex(s => s.id === studentId);
+      if (studentIndex !== -1) {
+        students.splice(studentIndex, 1);
+        saveToLocalStorage();
+        renderList();
+        updateSummary();
+        updateProgressBar();
+        if (editingId === studentId) cancelEdit();
+        showToast('Ardayga ayaa la tirtiray', 'success');
+      }
+    }
+
+    // UI Rendering
+    function renderList() {
+      const container = document.getElementById('studentList');
+      const filteredStudents = filterStudents();
+
+      if (!filteredStudents.length) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">
+              <i class="fas fa-book-reader"></i>
+            </div>
+            <h3 class="empty-title">${currentSearch ? 'Wax arday ah lama helin' : 'Ma jiraan arday diiwaangashan'}</h3>
+            <p>${currentSearch ? 'Hmmm.. lama helin wax arday ah oo ku habboon raadintaada' : 'Ku dar ardayda adiga oo isticmaalaya foomka kor'}</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = '';
+      filteredStudents.forEach(student => {
+        const studentEl = document.createElement('div');
+        studentEl.className = 'student-item';
+        studentEl.setAttribute('data-id', student.id);
+
+        const monthKey = `${currentYear}-${currentMonth}`;
+        const hasPaid = student.payments && student.payments[monthKey];
+        
+   studentEl.innerHTML = `
+          <div class="student-info">
+            <div class="student-avatar">${student.name.charAt(0).toUpperCase()}</div>
+            <div class="student-details">
+              <div class="student-name" title="${student.name}">${student.name}</div>
+              <div class="student-date">${student.dateAdded}</div>
+            </div>
+          </div>
+          <div class="payment-status-container">
+            <span class="payment-status ${hasPaid ? 'paid' : 'unpaid'}">
+              <i class="fas ${hasPaid ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+              ${monthNames[currentMonth-1]}
+            </span>
+            <div class="action-buttons">
+              <button class="btn btn-sm ${hasPaid ? 'btn-danger' : 'btn-success'} tooltip" 
+                      onclick="togglePayment('${student.id}')" title="${hasPaid ? 'U celi in aan bixin' : 'Muuji inuu bixiyay'}">
+                <i class="fas ${hasPaid ? 'fa-times' : 'fa-check'}"></i>
+                <span class="tooltip-text">${hasPaid ? 'U celi in aan bixin' : 'Muuji inuu bixiyay'}</span>
+              </button>
+              <button class="btn btn-sm btn-warning tooltip" 
+                      onclick="editStudent('${student.id}')" title="Wax ka beddel">
+                <i class="fas fa-edit"></i>
+                <span class="tooltip-text">Wax ka beddel</span>
+              </button>
+              <button class="btn btn-sm btn-danger tooltip" 
+                      onclick="deleteStudent('${student.id}')" title="Tirtir">
+                <i class="fas fa-trash"></i>
+                <span class="tooltip-text">Tirtir</span>
+              </button>
+            </div>
+          </div>
+        `;
+        container.appendChild(studentEl);
+      });
+    }
+    // Utility Functions
+    function filterStudents() {
+      const monthKey = `${currentYear}-${currentMonth}`;
+      return students.filter(student => {
+        const matchesSearch = !currentSearch || 
+          student.name.toLowerCase().includes(currentSearch);
+        
+        const paymentStatus = student.payments && student.payments[monthKey];
+        const matchesFilter = currentFilter === 'all' ||
+          (currentFilter === 'paid' && paymentStatus) ||
+          (currentFilter === 'unpaid' && !paymentStatus);
+        
+        return matchesSearch && matchesFilter;
+      });
+    }
+
+    function updateSummary() {
+      const monthKey = `${currentYear}-${currentMonth}`;
+      const paidCount = students.filter(s => s.payments && s.payments[monthKey]).length;
+      const totalAmount = paidCount * monthlyFee;
+      
+      document.getElementById('totalStudents').textContent = students.length;
+      document.getElementById('paidStudents').textContent = paidCount;
+      document.getElementById('unpaidStudents').textContent = students.length - paidCount;
+
+    }
+
+    function saveToLocalStorage() {
+      localStorage.setItem('students', JSON.stringify(students));
+    }
+
+    // Data Import/Export
+    function importData() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      
+      input.onchange = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        
+        reader.onload = event => {
+          try {
+            const importedData = JSON.parse(event.target.result);
+            const normalizedStudents = normalizeImportedData(importedData);
+            
+            if (normalizedStudents.length > 0) {
+              if (confirm(`Ma hubtaa inaad rabto inaad ku darto ${normalizedStudents.length} arday oo cusub?`)) {
+                students = [...normalizedStudents, ...students];
+                saveToLocalStorage();
+                renderList();
+                updateSummary();
+                updateProgressBar();
+                showToast(`${normalizedStudents.length} arday ayaa loo soo dajiyay`, 'success');
+              }
+            } else {
+              showToast('Faylka aad soo dejisay ma lahan xog macquul ah', 'error');
+            }
+          } catch (err) {
+            showToast('Khalad ayaa dhacay marka la akhrinayay faylka: ' + err.message, 'error');
+          }
+        };
+        
+        reader.onerror = () => {
+          showToast('Khalad ayaa dhacay marka la akhrinayay faylka', 'error');
+        };
+        
+        reader.readAsText(file);
+      };
+      
+      input.click();
+    }
+
+    function normalizeImportedData(data) {
+      if (!Array.isArray(data)) {
+        if (typeof data === 'object' && data.students) {
+          data = data.students;
+        } else {
+          return [];
+        }
+      }
+
+      return data.map(student => {
+        const normalized = {
+          id: student.id || Date.now().toString(),
+          name: student.name || 'Arday aan magac lahayn',
+          payments: student.payments || {},
+          dateAdded: student.dateAdded || new Date().toLocaleDateString('so-SO', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })
+        };
+
+        if (student.payments) {
+          normalized.payments = {};
+          for (const [monthKey, paid] of Object.entries(student.payments)) {
+            normalized.payments[monthKey] = Boolean(paid);
+          }
+        }
+
+        return normalized;
+      });
+    }
+
+    function exportData() {
+      if (students.length === 0) {
+        showToast('Ma jiraan xog la dhoofin karo', 'error');
+        return;
+      }
+      
+      const data = {
+        students: students,
+        exportedAt: new Date().toISOString(),
+        totalStudents: students.length
+      };
+      
+      const dataStr = JSON.stringify(data, null, 2);
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+      
+      const exportFileDefaultName = `ardayda-${new Date().toISOString().slice(0,10)}.json`;
+      
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', exportFileDefaultName);
+      linkElement.click();
+      
+      showToast('Xogtaada waa la dajiyay', 'success');
+    }
+
+    function clearData() {
+      if (students.length === 0) {
+        showToast('Ma jiraan xog la tirtiri karo', 'error');
+        return;
+      }
+      
+      if (confirm('Ma hubtaa inaad rabto inaad tirtirto dhammaan xogta ardayda?\n Ogow, tani waa mid aan dib loo soo celin karin!')) {
+        students = [];
+        saveToLocalStorage();
+        renderList();
+        updateSummary();
+        updateProgressBar();
+        cancelEdit();
+        showToast('Dhammaan xogta ayaa la tirtiray', 'success');
+      }
+    }
+
+    // Dark Mode Functions
+    function initDarkMode() {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const darkMode = localStorage.getItem('darkMode');
+      
+      if (darkMode === 'enabled' || (!darkMode && prefersDark)) {
+        document.body.classList.add('dark-mode');
+        document.getElementById('darkModeToggle').innerHTML = '<i class="fas fa-sun"></i>';
+      }
+    }
+
+    document.getElementById('darkModeToggle').addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+      document.getElementById('darkModeToggle').innerHTML = isDark ? 
+        '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    });
     
-    // Use your existing confirm dialog or this fallback
-    resolve(confirm(message));
-  });
-}
-
-/**
- * Merges new students with existing ones
- */
-function mergeStudents(newStudents) {
-  // Create a deep copy to avoid reference issues
-  const studentsToAdd = JSON.parse(JSON.stringify(newStudents));
-  
-  // Add to beginning of array so they appear first
-  students.unshift(...studentsToAdd);
-  
-  // Enforce maximum students if needed
-  if (students.length > 1000) { // Example limit
-    students = students.slice(0, 1000);
-    showAlert('Xadka ugu badan ee ardayda ayaa la gaaray', 'warning');
-  }
-  
-  saveToLocalStorage();
-  renderList();
-  updateSummary();
-}
-
-/**
- * Prepares student data for export
- */
-function cleanStudentForExport(student) {
-  return {
-    id: student.id,
-    name: student.name,
-    payments: student.payments,
-    dateAdded: student.dateAdded
-    // Exclude internal fields like _source, _importedAt
-  };
-}
-
-function toggleFab() {
-  document.querySelector('.fab-container').classList.toggle('open');
-}
-
-window.addEventListener("load", () => {
-  document.getElementById("loader").style.display = "none";
-});
+    // Toast notification
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast';
+      toast.classList.add(type);
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
