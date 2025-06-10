@@ -86,10 +86,7 @@
         if (e.key === 'Enter') addStudent();
       });
 
-      // Help FAB
-      document.getElementById('helpFab').addEventListener('click', () => {
-        document.querySelector('.help-box').scrollIntoView({ behavior: 'smooth' });
-      });
+    
     }
 
     function updateProgressBar() {
@@ -138,7 +135,7 @@
           setTimeout(() => newStudentEl.classList.remove('new'), 3000);
         }
         
-    
+        showToast('Ardayga cusub ayaa loo gu daray', 'success');
       } else {
         // Update existing student
         const studentIndex = students.findIndex(s => s.id === editingId);
@@ -167,7 +164,7 @@
         updateProgressBar();
         
         const status = student.payments[monthKey] ? 'Bixiyay' : 'Aan bixin';
-        
+        showToast(`Xaaladda ardayga waxaa loo beddelay ${status}`, 'success');
       }
     }
 
@@ -238,7 +235,7 @@
         const monthKey = `${currentYear}-${currentMonth}`;
         const hasPaid = student.payments && student.payments[monthKey];
         
-   studentEl.innerHTML = `
+        studentEl.innerHTML = `
           <div class="student-info">
             <div class="student-avatar">${student.name.charAt(0).toUpperCase()}</div>
             <div class="student-details">
@@ -273,6 +270,7 @@
         container.appendChild(studentEl);
       });
     }
+
     // Utility Functions
     function filterStudents() {
       const monthKey = `${currentYear}-${currentMonth}`;
@@ -297,7 +295,7 @@
       document.getElementById('totalStudents').textContent = students.length;
       document.getElementById('paidStudents').textContent = paidCount;
       document.getElementById('unpaidStudents').textContent = students.length - paidCount;
-
+      document.getElementById('totalAmount').textContent = totalAmount;
     }
 
     function saveToLocalStorage() {
@@ -322,7 +320,7 @@
             const normalizedStudents = normalizeImportedData(importedData);
             
             if (normalizedStudents.length > 0) {
-              if (confirm(`Ma hubtaa inaad rabto inaad ku darto ${normalizedStudents.length} arday oo cusub?`)) {
+              if (confirm(`Ma hubtaa inaad rabto inaad ku daro ${normalizedStudents.length} arday oo cusub?`)) {
                 students = [...normalizedStudents, ...students];
                 saveToLocalStorage();
                 renderList();
@@ -402,7 +400,7 @@
       linkElement.setAttribute('download', exportFileDefaultName);
       linkElement.click();
       
-      showToast('Xogtaada waa la dajiyay', 'success');
+      showToast('Xogta ayaa si guul leh loo dhoofiyay', 'success');
     }
 
     function clearData() {
@@ -411,7 +409,7 @@
         return;
       }
       
-      if (confirm('Ma hubtaa inaad rabto inaad tirtirto dhammaan xogta ardayda?\n Ogow, tani waa mid aan dib loo soo celin karin!')) {
+      if (confirm('Ma hubtaa inaad rabto inaad tirtirto dhammaan xogta ardayda?\nTani waa mid aan dib uga soo celin karin!')) {
         students = [];
         saveToLocalStorage();
         renderList();
