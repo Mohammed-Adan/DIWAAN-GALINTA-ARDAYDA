@@ -11,233 +11,109 @@
   <meta name="theme-color" content="#4F46E5" />
 </head>
 <body>
-<div id="loader">
-  <div class="spinner"></div>
-</div>
-<div class="header">
-  <div class="logo">
-    <div class="logo-icon">
-      <i class="fas fa-user-ninja"></i>
-    </div>
-    <h1>Maamulka Ardayda & Lacag bixintooda</h1>
-  </div>
-  
-  <button id="darkModeToggle" class="dark-mode-toggle">
-    <i class="fas fa-moon"></i>
-  </button>
-  <p class="subtitle">Diiwaangelinta ardayda iyo xogta lacag bixintooda si fudud oo sax ah</p>
-</div>
-<!-- Add this at the top of your body content -->
-<div class="logo-editor-wrapper">
-  <div class="logo-display">
-    <div class="text-logo">
-      <span class="school-name" id="displaySchoolName">  </span>
-      <span class="school-tagline" id="displaySchoolTagline">  
-    </div>
-    <div class="logo-actions">
-      <button class="icon-btn logo-edit-btn" id="editLogoBtn" title="Edit Logo">
-        <i class="fas fa-pen"></i>
-      </button>
-      <button class="icon-btn logo-copy-btn" id="copyLogoBtn" title="Copy Logo Text">
-        <i class="fas fa-copy"></i>
-      </button>
-    </div>
-  </div>
 
-  <!-- Edit Modal (hidden by default) -->
-  <div class="logo-edit-modal" id="logoEditModal">
-    <div class="modal-content">
-      <h3>Customize School Logo</h3>
-      <div class="form-group">
-        <label for="schoolNameInput">School Name</label>
-        <input type="text" id="schoolNameInput" class="form-control" maxlength="30">
-      </div>
-      <div class="form-group">
-        <label for="schoolTaglineInput">Tagline (Optional)</label>
-        <input type="text" id="schoolTaglineInput" class="form-control" maxlength="50">
-      </div>
-      <div class="form-group">
-        <label>Preview:</label>
-        <div class="logo-preview">
-          <span class="school-name" id="previewSchoolName"></span>
-          <span class="school-tagline" id="previewSchoolTagline"></span>
+  <div class="container">
+    <div class="header">
+      <div class="logo-container">
+        <div class="logo-icon">
+          <i class="fas fa-user-graduate"></i>
         </div>
+        <h1>Maamulka Ardayda & Lacag bixintooda</h1>
       </div>
-      <div class="modal-actions">
-        <button class="btn btn-secondary" id="cancelLogoEdit">Cancel</button>
-        <button class="btn btn-primary" id="saveLogoChanges">Save Changes</button>
+      
+      <button id="darkModeToggle" class="dark-mode-toggle">
+        <i class="fas fa-moon"></i>
+      </button>
+      <p class="subtitle">Diiwaangelinta ardayda iyo xogta lacag bixintooda si fudud oo sax ah</p>
+    </div>
+
+    <div class="toolbar">
+      <div class="search-container">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="searchInput" class="search-input" placeholder="Raadi ardayga..." />
+      </div>
+      <div class="month-selector">
+        <i class="fas fa-calendar-alt"></i>
+        <select id="monthSelect"></select>
+        <select id="yearSelect"></select>
+      </div>
+      <div class="filter-buttons">
+        <button class="filter-btn active" data-filter="all">
+          <i class="fas fa-list"></i> Dhammaan
+        </button>
+        <button class="filter-btn" data-filter="paid">
+          <i class="fas fa-check-circle"></i> Bixiyay
+        </button>
+        <button class="filter-btn" data-filter="unpaid">
+          <i class="fas fa-times-circle"></i> Aan bixin
+        </button>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- Add this JavaScript to your Script.js -->
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // DOM Elements
-    const editBtn = document.getElementById('editLogoBtn');
-    const copyBtn = document.getElementById('copyLogoBtn');
-    const modal = document.getElementById('logoEditModal');
-    const cancelBtn = document.getElementById('cancelLogoEdit');
-    const saveBtn = document.getElementById('saveLogoChanges');
-    const nameInput = document.getElementById('schoolNameInput');
-    const taglineInput = document.getElementById('schoolTaglineInput');
-    const previewName = document.getElementById('previewSchoolName');
-    const previewTagline = document.getElementById('previewSchoolTagline');
-    const displayName = document.getElementById('displaySchoolName');
-    const displayTagline = document.getElementById('displaySchoolTagline');
+    <div class="input-card">
+      <div class="input-group">
+        <input type="text" id="studentName" class="form-control" placeholder="Geli magaca ardayga..." />
+        <button class="btn btn-primary" id="addStudentBtn">
+          <i class="fas fa-plus"></i> Ku dar Ardayga
+        </button>
+      </div>
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+      </div>
+    </div>
 
-    // Load saved logo if exists
-    const savedName = localStorage.getItem('schoolName');
-    const savedTagline = localStorage.getItem('schoolTagline');
-    
-    if (savedName) displayName.textContent = savedName;
-    if (savedTagline) displayTagline.textContent = savedTagline;
+    <div class="dropdown-actions">
+      <button class="dropdown-toggle">
+        <i class="fas fa-database"></i>
+        <span>Xogta Ardayda</span>
+        <i class="fas fa-chevron-down"></i>
+      </button>
+      <div class="dropdown-menu">
+        <button class="dropdown-item" onclick="importData()">
+          <i class="fas fa-file-import"></i>
+          Soo Deji Xogta
+        </button>
+        <button class="dropdown-item" onclick="exportData()">
+          <i class="fas fa-file-export"></i>
+          Dhoofi Xogta
+        </button>
+        <button class="dropdown-item" onclick="clearData()">
+          <i class="fas fa-trash-alt"></i>
+          Tirtir Dhammaan
+        </button>
+      </div>
+    </div>
 
-    // Edit button click handler
-    editBtn.addEventListener('click', function() {
-      nameInput.value = displayName.textContent;
-      taglineInput.value = displayTagline.textContent || '';
-      updatePreview();
-      modal.style.display = 'flex';
-      nameInput.focus();
-    });
+    <div class="student-list" id="studentList"></div>
 
-    // Copy button click handler
-    copyBtn.addEventListener('click', function() {
-      const textToCopy = `${displayName.textContent}\n${displayTagline.textContent}`;
-      navigator.clipboard.writeText(textToCopy)
-        .then(() => {
-          // Show temporary feedback
-          const originalHtml = copyBtn.innerHTML;
-          copyBtn.innerHTML = '<i class="fas fa-check"></i>';
-          setTimeout(() => {
-            copyBtn.innerHTML = originalHtml;
-          }, 2000);
-        })
-        .catch(err => console.error('Failed to copy: ', err));
-    });
+    <div class="summary-cards">
+      <div class="summary-card">
+        <div class="summary-value" id="totalStudents">0</div>
+        <div class="summary-label">Wadarta Ardayda</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-value" id="paidStudents">0</div>
+        <div class="summary-label">Lacagta Bixiyay</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-value" id="unpaidStudents">0</div>
+        <div class="summary-label">Lacagta aan Bixin</div>
+      </div>
+  
 
-    // Cancel button click handler
-    cancelBtn.addEventListener('click', function() {
-      modal.style.display = 'none';
-    });
+    <div class="help-box">
+      <h3 class="help-title"><i class="fas fa-question-circle"></i> Hage & Tilmaamo</h3>
+      <p class="help-content">
+        Isticmaal foomka kor si aad ugu darto ardayda cusub. Riix badhanka "calamadda saxda ah ee cagaaran" si aad u muujiso in ardaygu uu bixiyay lacagtii bishaan.
+        Waxaad kaloo kala dooran kartaa ardayda iyo bisha aad rabto inaad eegto.
+        <br>
+        <br>
+        Mahadsanid.
+      </p>
 
-    // Save button click handler
-    saveBtn.addEventListener('click', function() {
-      const newName = nameInput.value.trim();
-      const newTagline = taglineInput.value.trim();
 
-      if (!newName) {
-        alert('Please enter a school name');
-        return;
-      }
-
-      // Update display
-      displayName.textContent = newName;
-      displayTagline.textContent = newTagline;
-
-      // Save to localStorage
-      localStorage.setItem('schoolName', newName);
-      localStorage.setItem('schoolTagline', newTagline);
-
-      // Hide modal
-      modal.style.display = 'none';
-    });
-
-    // Update preview as user types
-    nameInput.addEventListener('input', updatePreview);
-    taglineInput.addEventListener('input', updatePreview);
-
-    // Close modal when clicking outside
-    modal.addEventListener('click', function(e) {
-      if (e.target === modal) {
-        modal.style.display = 'none';
-      }
-    });
-
-    // Close modal with Escape key
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && modal.style.display === 'flex') {
-        modal.style.display = 'none';
-      }
-    });
-
-    // Helper function to update preview
-    function updatePreview() {
-      previewName.textContent = nameInput.value.trim() || 'MADARSA';
-      previewTagline.textContent = taglineInput.value.trim() || 'Al-Huda Academy';
-    }
-  });
-</script>
-<div class="toolbar">
-  <div class="search-container">
-    <i class="fas fa-search search-icon"></i>
-    <input type="text" id="searchInput" class="search-input" placeholder="Raadi ardayga..." />
-  </div>
-  <div class="month-selector">
-    <i class="fas fa-calendar-alt"></i>
-    <select id="monthSelect"></select>
-  </div>
-  <div class="filter-buttons">
-    <button class="filter-btn active" data-filter="all">
-      <i class="fas fa-list"></i> Dhammaan
-    </button>
-    <button class="filter-btn" data-filter="paid">
-      <i class="fas fa-check-circle"></i> Bixiyay
-    </button>
-    <button class="filter-btn" data-filter="unpaid">
-      <i class="fas fa-times-circle"></i> Aan bixin
-    </button>
-  </div>
-</div>
-
-<div class="input-card">
-  <div class="input-group">
-    <input type="text" id="studentName" class="form-control" placeholder="Geli magaca ardayga..." />
-    <button class="btn btn-primary" onclick="addStudent()">
-      <i class="fas fa-plus"></i> Ku dar Ardayga
-    </button>
-  </div>
-</div>
-
-<div class="dropdown-actions" style="margin-bottom: 1rem;">
-  <button class="dropdown-toggle">
-    <i class="fas fa-database"></i>
-    <span>Xogta Ardayda</span>
-    <i class="fas fa-chevron-down"></i>
-  </button>
-  <div class="dropdown-menu">
-    <button class="dropdown-item" onclick="importData()">
-      <i class="fas fa-file-import"></i>
-      Soo Deji Xogta
-    </button>
-    <button class="dropdown-item" onclick="exportData()">
-      <i class="fas fa-file-export"></i>
-      Dhoofi Xogta
-    </button>
-  </div>
-</div>
-
-<div class="student-list" id="studentList"></div>
-
-<div class="summary-cards">
-  <div class="summary-card">
-    <div class="summary-value" id="totalStudents">0</div>
-    <div class="summary-label">Wadarta Ardayda</div>
-  </div>
-  <div class="summary-card">
-    <div class="summary-value" id="paidStudents">0</div>
-    <div class="summary-label">Lacagta Bixiyay</div>
-  </div>
-  <div class="summary-card">
-    <div class="summary-value" id="unpaidStudents">0</div>
-    <div class="summary-label">Lacagta aan Bixin</div>
-  </div>
-</div>
-
+  <div id="toast" class="toast"></div>
 <script src="Script.js"></script>
-
 <script>
   if (typeof navigator.serviceWorker !== 'undefined') {
     navigator.serviceWorker.register('sw.js')
@@ -245,6 +121,6 @@
       .catch(err => console.log('Service Worker registration failed:', err));
   }
 </script>
-
 </body>
 </html>
+
