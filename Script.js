@@ -451,3 +451,31 @@
         toast.classList.remove('show');
       }, 3000);
     }
+
+function addStudent() {
+  const nameInput = document.getElementById('studentName');
+  const name = nameInput.value.trim();
+
+  if (!name) {
+    showToast('Please enter student name', 'error');
+    return;
+  }
+
+  // Add student logic here...
+  const newStudent = {
+    id: Date.now().toString(),
+    name: name,
+    payments: {},
+    dateAdded: new Date().toLocaleDateString('so-SO')
+  };
+  
+  students.unshift(newStudent);
+  saveToLocalStorage();
+  renderList();
+
+  // CLEAR THE INPUT FIELD (THIS IS THE KEY PART)
+  nameInput.value = ''; // This line does the clearing
+  nameInput.focus();   // Optional: keeps the field ready for next entry
+
+  showToast('Student added successfully', 'success');
+}
