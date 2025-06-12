@@ -73,3 +73,13 @@
     }
   }
 }
+
+"file_handlers": [
+  {
+    "action": "/open-json",
+    "accept": {
+      "application/json": [".json"]
+    },
+    "name": "Open JSON File"
+  }
+]
