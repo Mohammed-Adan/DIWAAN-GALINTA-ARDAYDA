@@ -8,9 +8,9 @@
     const monthlyFee = 50; // Default monthly fee in dollars
 
     const monthNames = [
-      "Janaayo", "Febraayo", "Maarso", "Abriil", 
-      "May", "Juun", "Luuliyo", "Agoosto", 
-      "Sebtembar", "Oktoobar", "Nofembar", "Desembar"
+      "January", "February", "March", "April", 
+      "May", "June", "July", "August", 
+      "Septembar", "October", "Nofembar", "Decembar"
     ];
 
     // Initialize App
@@ -39,7 +39,7 @@
       
       // Initialize year selector
       yearSelect.innerHTML = '';
-      for (let y = currentYear + 1; y >= currentYear - 5; y--) {
+      for (let y = currentYear + 0; y >= currentYear - 5; y--) {
         const option = document.createElement('option');
         option.value = y;
         option.textContent = y;
