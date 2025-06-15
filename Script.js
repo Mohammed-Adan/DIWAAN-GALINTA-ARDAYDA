@@ -1,160 +1,147 @@
-    // Main App Data
-    let students = JSON.parse(localStorage.getItem('students')) || [];
-    let editingId = null;
-    let currentFilter = 'all';
-    let currentSearch = '';
-    let currentMonth = new Date().getMonth() + 1;
-    let currentYear = new Date().getFullYear();
-    const monthlyFee = 50; // Default monthly fee in dollars
+// Main App Data
+let students = JSON.parse(localStorage.getItem('students')) || [];
+let editingId = null;
+let currentFilter = 'all';
+let currentSearch = '';
+let currentMonth = new Date().getMonth() + 1;
+let currentYear = new Date().getFullYear();
+const monthlyFee = 50; // Default monthly fee in dollars
 
-    const monthNames = [
-      "January", "February", "March", "April", 
-      "May", "June", "July", "August", 
-      "Septembar", "October", "Nofembar", "Decembar"
-    ];
+const monthNames = [
+    "January", "February", "March", "April", 
+    "May", "June", "July", "August", 
+    "September", "October", "November", "December"
+];
 
-    // Initialize App
-    document.addEventListener('DOMContentLoaded', () => {
-      initializeSelectors();
-      setupEventListeners();
-      renderList();
-      updateSummary();
-      initDarkMode();
-      updateProgressBar();
-    });
+// DOM Elements
+const elements = {
+    searchInput: document.getElementById('searchInput'),
+    monthSelect: document.getElementById('monthSelect'),
+    yearSelect: document.getElementById('yearSelect'),
+    studentName: document.getElementById('studentName'),
+    addStudentBtn: document.getElementById('addStudentBtn'),
+    progressBar: document.getElementById('progressBar'),
+    studentList: document.getElementById('studentList'),
+    totalStudents: document.getElementById('totalStudents'),
+    paidStudents: document.getElementById('paidStudents'),
+    unpaidStudents: document.getElementById('unpaidStudents'),
+    darkModeToggle: document.getElementById('darkModeToggle')
+};
 
-    function initializeSelectors() {
-      const monthSelect = document.getElementById('monthSelect');
-      const yearSelect = document.getElementById('yearSelect');
-      
-      // Initialize month selector
-      monthSelect.innerHTML = '';
-      monthNames.forEach((month, index) => {
+// Initialize App
+document.addEventListener('DOMContentLoaded', () => {
+    initializeSelectors();
+    setupEventListeners();
+    renderList();
+    updateSummary();
+    initDarkMode();
+    updateProgressBar();
+});
+
+function initializeSelectors() {
+    // Initialize month selector
+    elements.monthSelect.innerHTML = '';
+    monthNames.forEach((month, index) => {
         const option = document.createElement('option');
         option.value = index + 1;
         option.textContent = month;
         if (index + 1 === currentMonth) option.selected = true;
-        monthSelect.appendChild(option);
-      });
-      
-      // Initialize year selector
-      yearSelect.innerHTML = '';
-      for (let y = currentYear + 1; y >= currentYear - 5; y--) {
+        elements.monthSelect.appendChild(option);
+    });
+
+    // Initialize year selector
+    elements.yearSelect.innerHTML = '';
+    for (let y = currentYear; y <= currentYear + 5; y++) {
         const option = document.createElement('option');
         option.value = y;
         option.textContent = y;
         if (y === currentYear) option.selected = true;
-        yearSelect.appendChild(option);
-      }
+        elements.yearSelect.appendChild(option);
+    }
+}
 
-      // Event listeners
-      monthSelect.addEventListener('change', (e) => {
+function setupEventListeners() {
+    // Search input
+    elements.searchInput.addEventListener('input', (e) => {
+        currentSearch = e.target.value.toLowerCase();
+        renderList();
+    });
+
+    // Month/year selectors
+    elements.monthSelect.addEventListener('change', (e) => {
         currentMonth = parseInt(e.target.value);
         renderList();
         updateProgressBar();
-      });
+    });
 
-      yearSelect.addEventListener('change', (e) => {
+    elements.yearSelect.addEventListener('change', (e) => {
         currentYear = parseInt(e.target.value);
         renderList();
         updateProgressBar();
-      });
-    }
+    });
 
-    function setupEventListeners() {
-      // Search input
-      document.getElementById('searchInput').addEventListener('input', (e) => {
-        currentSearch = e.target.value.toLowerCase();
-        renderList();
-      });
-
-      // Filter buttons
-      document.querySelectorAll('.filter-btn').forEach(btn => {
+    // Filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-          currentFilter = btn.dataset.filter;
-          document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          renderList();
+            currentFilter = btn.dataset.filter;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderList();
         });
-      });
+    });
 
-      // Add student button
-      document.getElementById('addStudentBtn').addEventListener('click', addStudent);
-
-      // Add student on Enter key
-      document.getElementById('studentName').addEventListener('keypress', (e) => {
+    // Student management
+    elements.addStudentBtn.addEventListener('click', addStudent);
+    elements.studentName.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') addStudent();
-      });
+    });
 
+    // Dark mode toggle
+    elements.darkModeToggle.addEventListener('click', toggleDarkMode);
+}
 
-    }
+// Student CRUD Operations
+function addStudent() {
+    const name = elements.studentName.value.trim();
 
-    function updateProgressBar() {
-      const monthKey = `${currentYear}-${currentMonth}`;
-      const paidCount = students.filter(s => s.payments && s.payments[monthKey]).length;
-      const totalStudents = students.length;
-      const percentage = totalStudents > 0 ? Math.round((paidCount / totalStudents) * 100) : 0;
-      
-      const progressBar = document.getElementById('progressBar');
-      progressBar.style.width = `${percentage}%`;
-      progressBar.title = `${percentage}% lacag bixi (${paidCount}/${totalStudents})`;
-    }
-
-    // Student CRUD Operations
-    function addStudent() {
-      const nameInput = document.getElementById('studentName');
-      const name = nameInput.value.trim();
-
-      if (!name) {
+    if (!name) {
         showToast('Fadlan geli magaca ardayga', 'error');
         return;
-      }
+    }
 
-      if (editingId === null) {
+    if (editingId === null) {
         // Add new student
         const newStudent = {
-          id: Date.now().toString(),
-          name: name,
-          payments: {},
-          dateAdded: new Date().toLocaleDateString('so-SO', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          })
+            id: Date.now().toString(),
+            name: name,
+            payments: {},
+            dateAdded: new Date().toLocaleDateString('so-SO')
         };
         students.unshift(newStudent);
         saveToLocalStorage();
         renderList();
         updateSummary();
         updateProgressBar();
-        
-        // Highlight new student
-        const newStudentEl = document.querySelector(`[data-id="${newStudent.id}"]`);
-        if (newStudentEl) {
-          newStudentEl.classList.add('new');
-          setTimeout(() => newStudentEl.classList.remove('new'), 3000);
-        }
-        
         showToast('Ardayga cusub ayaa loo gu daray', 'success');
-      } else {
+    } else {
         // Update existing student
         const studentIndex = students.findIndex(s => s.id === editingId);
         if (studentIndex !== -1) {
-          students[studentIndex].name = name;
-          saveToLocalStorage();
-          renderList();
-          
+            students[studentIndex].name = name;
+            saveToLocalStorage();
+            renderList();
+            showToast('Magaca ardayga waa la cusboonaysiiyay', 'success');
         }
         cancelEdit();
-      }
-
-      nameInput.value = '';
-      nameInput.focus();
     }
 
-    function togglePayment(studentId) {
-      const student = students.find(s => s.id === studentId);
-      if (student) {
+    elements.studentName.value = '';
+    elements.studentName.focus();
+}
+
+function togglePayment(studentId) {
+    const student = students.find(s => s.id === studentId);
+    if (student) {
         const monthKey = `${currentYear}-${currentMonth}`;
         if (!student.payments) student.payments = {};
         student.payments[monthKey] = !student.payments[monthKey];
@@ -162,42 +149,26 @@
         renderList();
         updateSummary();
         updateProgressBar();
-        
-        const status = student.payments[monthKey] ? ' ' : 'Aan bixin';
-        showToast(`Xaaladda ardayga waxaa loo beddelay ${status}`, 'success');
-      }
     }
+}
 
-    function editStudent(studentId) {
-      const student = students.find(s => s.id === studentId);
-      if (student) {
+function editStudent(studentId) {
+    const student = students.find(s => s.id === studentId);
+    if (student) {
         editingId = studentId;
-        const nameInput = document.getElementById('studentName');
-        nameInput.value = student.name;
-        nameInput.focus();
-        
-        const addBtn = document.getElementById('addStudentBtn');
-        addBtn.innerHTML = '<i class="fas fa-save"></i> Kaydi Isbedelka';
-        addBtn.classList.add('btn-info');
-        addBtn.classList.remove('btn-primary');
-      }
+        elements.studentName.value = student.name;
+        elements.studentName.focus();
+        elements.addStudentBtn.innerHTML = '<i class="fas fa-save"></i> Kaydi Isbedelka';
+        elements.addStudentBtn.classList.add('btn-info');
+        elements.addStudentBtn.classList.remove('btn-primary');
     }
+}
 
-    function cancelEdit() {
-      editingId = null;
-      document.getElementById('studentName').value = '';
-      
-      const addBtn = document.getElementById('addStudentBtn');
-      addBtn.innerHTML = '<i class="fas fa-plus"></i> Ku dar Ardayga';
-      addBtn.classList.add('btn-primary');
-      addBtn.classList.remove('btn-info');
-    }
+function deleteStudent(studentId) {
+    if (!confirm('Ma hubtaa inaad rabto inaad tirtirto ardaygan?')) return;
 
-    function deleteStudent(studentId) {
-      if (!confirm('Ma hubtaa inaad rabto inaad tirtirto ardaygan?')) return;
-      
-      const studentIndex = students.findIndex(s => s.id === studentId);
-      if (studentIndex !== -1) {
+    const studentIndex = students.findIndex(s => s.id === studentId);
+    if (studentIndex !== -1) {
         students.splice(studentIndex, 1);
         saveToLocalStorage();
         renderList();
@@ -205,245 +176,211 @@
         updateProgressBar();
         if (editingId === studentId) cancelEdit();
         showToast('Ardayga ayaa la tirtiray', 'success');
-      }
     }
+}
 
-    // UI Rendering
-    function renderList() {
-      const container = document.getElementById('studentList');
-      const filteredStudents = filterStudents();
+function cancelEdit() {
+    editingId = null;
+    elements.studentName.value = '';
+    elements.addStudentBtn.innerHTML = '<i class="fas fa-plus"></i> Ku dar Ardayga';
+    elements.addStudentBtn.classList.add('btn-primary');
+    elements.addStudentBtn.classList.remove('btn-info');
+}
 
-      if (!filteredStudents.length) {
-        container.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-icon">
-              <i class="fas fa-book-reader"></i>
+// UI Rendering
+function renderList() {
+    const filteredStudents = filterStudents();
+
+    if (!filteredStudents.length) {
+        elements.studentList.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-book-reader"></i>
+                </div>
+                <h3 class="empty-title">${currentSearch ? 'Wax arday ah lama helin' : 'Ma jiraan arday diiwaangashan'}</h3>
+                <p>${currentSearch ? 'Hmmm.. lama helin wax arday ah oo ku habboon raadintaada' : 'Ku dar ardayda adiga oo isticmaalaya foomka kor'}</p>
             </div>
-            <h3 class="empty-title">${currentSearch ? 'Wax arday ah lama helin' : 'Ma jiraan arday diiwaangashan'}</h3>
-            <p>${currentSearch ? 'Hmmm.. lama helin wax arday ah oo ku habboon raadintaada' : 'Ku dar ardayda adiga oo isticmaalaya foomka kor'}</p>
-          </div>
         `;
         return;
-      }
+    }
 
-      container.innerHTML = '';
-      filteredStudents.forEach(student => {
+    elements.studentList.innerHTML = '';
+    filteredStudents.forEach(student => {
+        const monthKey = `${currentYear}-${currentMonth}`;
+        const hasPaid = student.payments && student.payments[monthKey];
+
         const studentEl = document.createElement('div');
         studentEl.className = 'student-item';
         studentEl.setAttribute('data-id', student.id);
-
-        const monthKey = `${currentYear}-${currentMonth}`;
-        const hasPaid = student.payments && student.payments[monthKey];
-        
         studentEl.innerHTML = `
-          <div class="student-info">
-            <div class="student-avatar">${student.name.charAt(0).toUpperCase()}</div>
-            <div class="student-details">
-              <div class="student-name" title="${student.name}">${student.name}</div>
-              <div class="student-date">${student.dateAdded}</div>
+            <div class="student-info">
+                <div class="student-avatar">${student.name.charAt(0).toUpperCase()}</div>
+                <div class="student-details">
+                    <div class="student-name">${student.name}</div>
+                    <div class="student-date">${student.dateAdded}</div>
+                </div>
             </div>
-          </div>
-          <div class="payment-status-container">
-            <span class="payment-status ${hasPaid ? 'paid' : 'unpaid'}">
-              <i class="fas ${hasPaid ? 'fa-check-circle' : 'fa-times-circle'}"></i>
-              ${monthNames[currentMonth-1]}
-            </span>
-<div class="segmented-actions">
-  <div class="segmented-group">
-    <button class="segmented-btn pay-toggle ${hasPaid ? 'paid' : 'unpaid'}" 
-            onclick="togglePayment('${student.id}')">
-      <i class="fas ${hasPaid ? 'fa-check' : 'fa-times'}"></i>
-    </button>
-    <button class="segmented-btn" onclick="editStudent('${student.id}')">
-      <i class="fas fa-pencil"></i>
-    </button>
-    <button class="segmented-btn delete" onclick="deleteStudent('${student.id}')">
-      <i class="fas fa-trash"></i>
-    </button>
-  </div>
-</div>
+            <div class="payment-status-container">
+                <span class="payment-status ${hasPaid ? 'paid' : 'unpaid'}">
+                    <i class="fas ${hasPaid ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                    ${monthNames[currentMonth-1]}
+                </span>
+                <div class="segmented-actions">
+                    <div class="segmented-group">
+                        <button class="segmented-btn pay-toggle ${hasPaid ? 'paid' : 'unpaid'}" 
+                                onclick="togglePayment('${student.id}')">
+                            <i class="fas ${hasPaid ? 'fa-check' : 'fa-times'}"></i>
+                        </button>
+                        <button class="segmented-btn" onclick="editStudent('${student.id}')">
+                            <i class="fas fa-pencil"></i>
+                        </button>
+                        <button class="segmented-btn delete" onclick="deleteStudent('${student.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
         `;
-        container.appendChild(studentEl);
-      });
-    }
+        elements.studentList.appendChild(studentEl);
+    });
+}
 
-    // Utility Functions
-    function filterStudents() {
-      const monthKey = `${currentYear}-${currentMonth}`;
-      return students.filter(student => {
+// Utility Functions
+function filterStudents() {
+    const monthKey = `${currentYear}-${currentMonth}`;
+    return students.filter(student => {
         const matchesSearch = !currentSearch || 
-          student.name.toLowerCase().includes(currentSearch);
-        
+            student.name.toLowerCase().includes(currentSearch);
         const paymentStatus = student.payments && student.payments[monthKey];
         const matchesFilter = currentFilter === 'all' ||
-          (currentFilter === 'paid' && paymentStatus) ||
-          (currentFilter === 'unpaid' && !paymentStatus);
-        
+            (currentFilter === 'paid' && paymentStatus) ||
+            (currentFilter === 'unpaid' && !paymentStatus);
         return matchesSearch && matchesFilter;
-      });
-    }
+    });
+}
 
-    function updateSummary() {
-      const monthKey = `${currentYear}-${currentMonth}`;
-      const paidCount = students.filter(s => s.payments && s.payments[monthKey]).length;
-      const totalAmount = paidCount * monthlyFee;
-      
-      document.getElementById('totalStudents').textContent = students.length;
-      document.getElementById('paidStudents').textContent = paidCount;
-      document.getElementById('unpaidStudents').textContent = students.length - paidCount;
-      document.getElementById('totalAmount').textContent = totalAmount;
-    }
+function updateSummary() {
+    const monthKey = `${currentYear}-${currentMonth}`;
+    const paidCount = students.filter(s => s.payments && s.payments[monthKey]).length;
+    
+    elements.totalStudents.textContent = students.length;
+    elements.paidStudents.textContent = paidCount;
+    elements.unpaidStudents.textContent = students.length - paidCount;
+}
 
-    function saveToLocalStorage() {
-      localStorage.setItem('students', JSON.stringify(students));
-    }
+function updateProgressBar() {
+    const monthKey = `${currentYear}-${currentMonth}`;
+    const paidCount = students.filter(s => s.payments && s.payments[monthKey]).length;
+    const percentage = students.length > 0 ? Math.round((paidCount / students.length) * 100) : 0;
 
-    // Data Import/Export
-    function importData() {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = '.json';
-      
-      input.onchange = e => {
+    elements.progressBar.style.width = `${percentage}%`;
+    elements.progressBar.title = `${percentage}% lacag bixi (${paidCount}/${students.length})`;
+}
+
+function saveToLocalStorage() {
+    localStorage.setItem('students', JSON.stringify(students));
+}
+
+// Data Import/Export (called via onclick in HTML)
+function importData() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = e => {
         const file = e.target.files[0];
         if (!file) return;
-        
+
         const reader = new FileReader();
-        
         reader.onload = event => {
-          try {
-            const importedData = JSON.parse(event.target.result);
-            const normalizedStudents = normalizeImportedData(importedData);
-            
-            if (normalizedStudents.length > 0) {
-              if (confirm(`Ma hubtaa inaad rabto inaad ku daro ${normalizedStudents.length} arday oo cusub?`)) {
-                students = [...normalizedStudents, ...students];
-                saveToLocalStorage();
-                renderList();
-                updateSummary();
-                updateProgressBar();
-                showToast(`${normalizedStudents.length} arday ayaa loo soo dajiyay`, 'success');
-              }
-            } else {
-              showToast('Faylka aad soo dejisay ma lahan xog macquul ah', 'error');
+            try {
+                const importedData = JSON.parse(event.target.result);
+                const newStudents = Array.isArray(importedData) ? importedData : 
+                                  (importedData.students || []);
+                
+                if (newStudents.length > 0 && confirm(`Ma hubtaa inaad ku daro ${newStudents.length} arday?`)) {
+                    students = [...newStudents, ...students];
+                    saveToLocalStorage();
+                    renderList();
+                    updateSummary();
+                    updateProgressBar();
+                    showToast(`${newStudents.length} arday ayaa loo soo dajiyay`, 'success');
+                }
+            } catch (err) {
+                showToast('Khalad ayaa dhacay marka la akhrinayay faylka', 'error');
             }
-          } catch (err) {
-            showToast('Khalad ayaa dhacay marka la akhrinayay faylka: ' + err.message, 'error');
-          }
         };
-        
-        reader.onerror = () => {
-          showToast('Khalad ayaa dhacay marka la akhrinayay faylka', 'error');
-        };
-        
         reader.readAsText(file);
-      };
-      
-      input.click();
-    }
+    };
+    input.click();
+}
 
-    function normalizeImportedData(data) {
-      if (!Array.isArray(data)) {
-        if (typeof data === 'object' && data.students) {
-          data = data.students;
-        } else {
-          return [];
-        }
-      }
-
-      return data.map(student => {
-        const normalized = {
-          id: student.id || Date.now().toString(),
-          name: student.name || 'Arday aan magac lahayn',
-          payments: student.payments || {},
-          dateAdded: student.dateAdded || new Date().toLocaleDateString('so-SO', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          })
-        };
-
-        if (student.payments) {
-          normalized.payments = {};
-          for (const [monthKey, paid] of Object.entries(student.payments)) {
-            normalized.payments[monthKey] = Boolean(paid);
-          }
-        }
-
-        return normalized;
-      });
-    }
-
-    function exportData() {
-      if (students.length === 0) {
+function exportData() {
+    if (students.length === 0) {
         showToast('Ma jiraan xog la dhoofin karo', 'error');
         return;
-      }
-      
-      const data = {
-        students: students,
-        exportedAt: new Date().toISOString(),
-        totalStudents: students.length
-      };
-      
-      const dataStr = JSON.stringify(data, null, 2);
-      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-      
-      const exportFileDefaultName = `ardayda-${new Date().toISOString().slice(0,10)}.json`;
-      
-      const linkElement = document.createElement('a');
-      linkElement.setAttribute('href', dataUri);
-      linkElement.setAttribute('download', exportFileDefaultName);
-      linkElement.click();
-      
-      showToast('Xogta ayaa si guul leh loo dhoofiyay', 'success');
     }
 
-    function clearData() {
-      if (students.length === 0) {
+    const data = {
+        students: students,
+        exportedAt: new Date().toISOString()
+    };
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ardayda-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    showToast('Xogta ayaa si guul leh loo dhoofiyay', 'success');
+}
+
+function clearData() {
+    if (students.length === 0) {
         showToast('Ma jiraan xog la tirtiri karo', 'error');
         return;
-      }
-      
-      if (confirm('Ma hubtaa inaad rabto inaad tirtirto dhammaan xogta ardayda?\nTani waa mid aan dib uga soo celin karin!')) {
+    }
+
+    if (confirm('Ma hubtaa inaad tirtirto dhammaan xogta ardayda?\nTani waa mid aan dib uga soo celin karin!')) {
         students = [];
         saveToLocalStorage();
         renderList();
         updateSummary();
         updateProgressBar();
-        cancelEdit();
         showToast('Dhammaan xogta ayaa la tirtiray', 'success');
-      }
     }
+}
 
-    // Dark Mode Functions
-    function initDarkMode() {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const darkMode = localStorage.getItem('darkMode');
-      
-      if (darkMode === 'enabled' || (!darkMode && prefersDark)) {
+// Dark Mode Functions
+function initDarkMode() {
+    const darkMode = localStorage.getItem('darkMode');
+    if (darkMode === 'enabled') {
         document.body.classList.add('dark-mode');
-        document.getElementById('darkModeToggle').innerHTML = '<i class="fas fa-sun"></i>';
-      }
+        elements.darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
     }
+}
 
-    document.getElementById('darkModeToggle').addEventListener('click', () => {
-      document.body.classList.toggle('dark-mode');
-      const isDark = document.body.classList.contains('dark-mode');
-      localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
-      document.getElementById('darkModeToggle').innerHTML = isDark ? 
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+    elements.darkModeToggle.innerHTML = isDark ? 
         '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-    });
+}
+
+// Toast notification
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
     
-    // Toast notification
-    function showToast(message, type = 'info') {
-      const toast = document.getElementById('toast');
-      toast.textContent = message;
-      toast.className = 'toast';
-      toast.classList.add(type);
-      toast.classList.add('show');
-      
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 3000);
-    }
+    setTimeout(() => {
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }, 10);
+}
