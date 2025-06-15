@@ -143,7 +143,7 @@
           students[studentIndex].name = name;
           saveToLocalStorage();
           renderList();
-          showToast('Magaca ardayga waa la cusboonaysiiyay', 'success');
+          
         }
         cancelEdit();
       }
