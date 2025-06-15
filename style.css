@@ -1109,8 +1109,6 @@
     body.dark-mode .badge {
       background-color: var(--dm-primary-light);
     }
-
-
 .segmented-actions {
   display: flex;
   margin-left: auto;
