@@ -62,7 +62,7 @@ for (let y = currentYear; y >= startYear; y--) {
     if (y === currentYear) option.selected = true; // ha ahaado sanadka hadda mid xulan
     elements.yearSelect.appendChild(option);
 }
-}
+
 
 function setupEventListeners() {
     // Search input
