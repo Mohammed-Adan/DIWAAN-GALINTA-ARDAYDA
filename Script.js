@@ -1,5 +1,5 @@
 // Main App Data
-let students = [];
+let students = []; 
 try {
     students = JSON.parse(localStorage.getItem('students')) || [];
 } catch (e) {
