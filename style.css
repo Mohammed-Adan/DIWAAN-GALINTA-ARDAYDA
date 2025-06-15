@@ -1109,3 +1109,69 @@
     body.dark-mode .badge {
       background-color: var(--dm-primary-light);
     }
+
+
+.segmented-actions {
+  display: flex;
+  margin-left: auto;
+}
+
+.segmented-group {
+  display: flex;
+  background: var(--border);
+  border-radius: 20px;
+  padding: 4px;
+  gap: 2px;
+}
+
+body.dark-mode .segmented-group {
+  background: var(--dm-border);
+}
+
+.segmented-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 16px;
+  background: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-light);
+}
+
+.segmented-btn.active {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.segmented-btn:hover:not(.active) {
+  background: rgba(79, 70, 229, 0.1);
+  color: var(--primary);
+}
+
+.segmented-btn.delete:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+}
+
+/* Add these to your existing segmented button styles */
+.segmented-btn.pay-toggle.paid {
+  background: var(--success) !important;
+  color: white !important;
+}
+
+.segmented-btn.pay-toggle.unpaid {
+  background: var(--danger) !important;
+  color: white !important;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
