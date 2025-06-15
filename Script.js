@@ -49,24 +49,19 @@ function initializeSelectors() {
         elements.monthSelect.appendChild(option);
     });
 
-   
-      // Initialize year selector
-const currentYear = new Date().getFullYear(); // Tusaale ahaan: 2025
-const endYear = currentYear + 5; // Ilaa 5 sano mustaqbalka
+    // Initialize year selector
+    const currentYear = new Date().getFullYear(); // tusaale: 2025
+const startYear = currentYear - 5; // haddii aad rabto 5 sano oo la soo dhaafay
 
-elements.yearSelect.innerHTML = ''; // Tirtir wixii hore ku jiray
+elements.yearSelect.innerHTML = ''; // tirtir wixii hore
 
-for (let y = currentYear; y <= endYear; y++) {
-  const option = document.createElement('option');
-  option.value = y;
-  option.textContent = y;
-
-  // Ha ahaado sanadka hadda socda mid xulan (selected)
-  if (y === currentYear) {
-    option.selected = true;
-  }
-
-  elements.yearSelect.appendChild(option);
+for (let y = currentYear; y >= startYear; y--) {
+    const option = document.createElement('option');
+    option.value = y;
+    option.textContent = y;
+    if (y === currentYear) option.selected = true; // ha ahaado sanadka hadda mid xulan
+    elements.yearSelect.appendChild(option);
+}
 }
 
 function setupEventListeners() {
@@ -114,7 +109,7 @@ function addStudent() {
     const name = elements.studentName.value.trim();
 
     if (!name) {
-        showToast('Fadlan geli magaca ardayga, ugu horreyn', 'error');
+        showToast('Fadlan geli magaca ardayga,ugu horreyn', 'error');
         return;
     }
 
@@ -131,7 +126,7 @@ function addStudent() {
         renderList();
         updateSummary();
         updateProgressBar();
-        showToast('Ardayga cusub ayaa loo gu daray', 'success');
+        showToast('waa lagu daray', 'success');
     } else {
         // Update existing student
         const studentIndex = students.findIndex(s => s.id === editingId);
@@ -139,7 +134,7 @@ function addStudent() {
             students[studentIndex].name = name;
             saveToLocalStorage();
             renderList();
-            showToast('Magaca waa la cusboonaysiiyay', 'success');
+            showToast('Waa la cusboonaysiiyay', 'success');
         }
         cancelEdit();
     }
@@ -184,7 +179,7 @@ function deleteStudent(studentId) {
         updateSummary();
         updateProgressBar();
         if (editingId === studentId) cancelEdit();
-        showToast('Ardayga ayaa la tirtiray', 'success');
+        showToast('Waa la tirtiray', 'success');
     }
 }
 
@@ -202,16 +197,18 @@ function renderList() {
 
     if (!filteredStudents.length) {
         elements.studentList.innerHTML = `
+        
             <div class="empty-state">
                 <div class="empty-icon">
                     <i class="fas fa-book-reader"></i>
                 </div>
-                <h3 class="empty-title">${currentSearch ? 'Wax arday ah lama helin' : 'Ma jiraan arday diiwaangashan' laga yaabee inaad wax ka qaladday magaca}</h3>
+                <h3 class="empty-title">${currentSearch ? 'Wax arday ah lama helin' : 'Ma jiraan arday diiwaangashan'}</h3>
                 <p>${currentSearch ? 'Hmmm.. lama helin wax arday ah oo ku habboon raadintaada' : 'Ku dar ardayda adiga oo isticmaalaya foomka kor'}</p>
             </div>
         `;
         return;
     }
+    
 
     elements.studentList.innerHTML = '';
     filteredStudents.forEach(student => {
@@ -250,6 +247,7 @@ function renderList() {
                 </div>
             </div>
         `;
+        
         elements.studentList.appendChild(studentEl);
     });
 }
@@ -306,7 +304,7 @@ function importData() {
                 const newStudents = Array.isArray(importedData) ? importedData : 
                                   (importedData.students || []);
                 
-                if (newStudents.length > 0 && confirm(`Ma hubtaa inaad ku daro ${newStudents.length} arday?`)) {
+                if (newStudents.length > 0 && confirm(`Ma hubtaa inaad ku darto ${newStudents.length} arday?`)) {
                     students = [...newStudents, ...students];
                     saveToLocalStorage();
                     renderList();
@@ -342,7 +340,7 @@ function exportData() {
     a.click();
     URL.revokeObjectURL(url);
     
-    showToast('Xogta ayaa si guul leh loo dhoofiyay', 'success');
+    showToast('Waa la dhoofiyay oo laguu dajiay', 'success');
 }
 
 function clearData() {
@@ -351,7 +349,7 @@ function clearData() {
         return;
     }
 
-    if (confirm('Ma hubtaa inaad tirtirto dhammaan xogta ardayda?\nTani waa mid aan dib loogu soo celin karin!')) {
+    if (confirm('Ma hubtaa inaad tirtirto dhammaan xogta ardayda?\nTani waa mid aan dib loo soo celin karin!')) {
         students = [];
         saveToLocalStorage();
         renderList();
