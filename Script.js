@@ -1,5 +1,12 @@
 // Main App Data
-let students = JSON.parse(localStorage.getItem('students')) || [];
+let students = [];
+try {
+    students = JSON.parse(localStorage.getItem('students')) || [];
+} catch (e) {
+    console.error("Error parsing student data from localStorage", e);
+    students = [];
+}
+
 let editingId = null;
 let currentFilter = 'all';
 let currentSearch = '';
@@ -50,8 +57,10 @@ function initializeSelectors() {
     });
 
     // Initialize year selector
+    const startYear = currentYear - 5;
     elements.yearSelect.innerHTML = '';
-    for (let y = currentYear; y <= currentYear + 5; y++) {
+
+    for (let y = currentYear; y >= startYear; y--) {
         const option = document.createElement('option');
         option.value = y;
         option.textContent = y;
@@ -105,7 +114,7 @@ function addStudent() {
     const name = elements.studentName.value.trim();
 
     if (!name) {
-        showToast('Fadlan geli magaca ardayga,ugu horreyn', 'error');
+        showToast('Fadlan geli magaca ardayga, ugu horreyn', 'error');
         return;
     }
 
@@ -115,7 +124,7 @@ function addStudent() {
             id: Date.now().toString(),
             name: name,
             payments: {},
-            dateAdded: new Date().toLocaleDateString('so-SO')
+            dateAdded: new Date().toISOString()
         };
         students.unshift(newStudent);
         saveToLocalStorage();
@@ -142,7 +151,7 @@ function addStudent() {
 function togglePayment(studentId) {
     const student = students.find(s => s.id === studentId);
     if (student) {
-        const monthKey = `${currentYear}-${currentMonth}`;
+        const monthKey = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
         if (!student.payments) student.payments = {};
         student.payments[monthKey] = !student.payments[monthKey];
         saveToLocalStorage();
@@ -193,7 +202,6 @@ function renderList() {
 
     if (!filteredStudents.length) {
         elements.studentList.innerHTML = `
-        
             <div class="empty-state">
                 <div class="empty-icon">
                     <i class="fas fa-book-reader"></i>
@@ -204,12 +212,11 @@ function renderList() {
         `;
         return;
     }
-    
 
     elements.studentList.innerHTML = '';
     filteredStudents.forEach(student => {
-        const monthKey = `${currentYear}-${currentMonth}`;
-        const hasPaid = student.payments && student.payments[monthKey];
+        const monthKey = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
+        const hasPaid = student.payments?.[monthKey] || false;
 
         const studentEl = document.createElement('div');
         studentEl.className = 'student-item';
@@ -219,7 +226,7 @@ function renderList() {
                 <div class="student-avatar">${student.name.charAt(0).toUpperCase()}</div>
                 <div class="student-details">
                     <div class="student-name">${student.name}</div>
-                    <div class="student-date">${student.dateAdded}</div>
+                    <div class="student-date">${new Date(student.dateAdded).toLocaleDateString('so-SO')}</div>
                 </div>
             </div>
             <div class="payment-status-container">
@@ -250,11 +257,11 @@ function renderList() {
 
 // Utility Functions
 function filterStudents() {
-    const monthKey = `${currentYear}-${currentMonth}`;
+    const monthKey = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
     return students.filter(student => {
         const matchesSearch = !currentSearch || 
             student.name.toLowerCase().includes(currentSearch);
-        const paymentStatus = student.payments && student.payments[monthKey];
+        const paymentStatus = student.payments?.[monthKey] || false;
         const matchesFilter = currentFilter === 'all' ||
             (currentFilter === 'paid' && paymentStatus) ||
             (currentFilter === 'unpaid' && !paymentStatus);
@@ -263,8 +270,8 @@ function filterStudents() {
 }
 
 function updateSummary() {
-    const monthKey = `${currentYear}-${currentMonth}`;
-    const paidCount = students.filter(s => s.payments && s.payments[monthKey]).length;
+    const monthKey = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
+    const paidCount = students.filter(s => s.payments?.[monthKey]).length;
     
     elements.totalStudents.textContent = students.length;
     elements.paidStudents.textContent = paidCount;
@@ -272,19 +279,25 @@ function updateSummary() {
 }
 
 function updateProgressBar() {
-    const monthKey = `${currentYear}-${currentMonth}`;
-    const paidCount = students.filter(s => s.payments && s.payments[monthKey]).length;
+    const monthKey = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
+    const paidCount = students.filter(s => s.payments?.[monthKey]).length;
     const percentage = students.length > 0 ? Math.round((paidCount / students.length) * 100) : 0;
 
     elements.progressBar.style.width = `${percentage}%`;
+    elements.progressBar.setAttribute('aria-valuenow', percentage);
     elements.progressBar.title = `${percentage}% lacag bixi (${paidCount}/${students.length})`;
 }
 
 function saveToLocalStorage() {
-    localStorage.setItem('students', JSON.stringify(students));
+    try {
+        localStorage.setItem('students', JSON.stringify(students));
+    } catch (e) {
+        showToast('Khalad: Xogta aad ku kaydisay waa ay weydaan!', 'error');
+        console.error("LocalStorage error:", e);
+    }
 }
 
-// Data Import/Export (called via onclick in HTML)
+// Data Import/Export
 function importData() {
     const input = document.createElement('input');
     input.type = 'file';
@@ -387,4 +400,3 @@ function showToast(message, type = 'info') {
         }, 3000);
     }, 10);
 }
-
