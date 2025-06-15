@@ -50,14 +50,18 @@ function initializeSelectors() {
     });
 
     // Initialize year selector
-    elements.yearSelect.innerHTML = '';
-    for (let y = currentYear; y <= currentYear + 5; y++) {
-        const option = document.createElement('option');
-        option.value = y;
-        option.textContent = y;
-        if (y === currentYear) option.selected = true;
-        elements.yearSelect.appendChild(option);
-    }
+    const currentYear = new Date().getFullYear(); // tusaale: 2025
+const startYear = currentYear - 5; // haddii aad rabto 5 sano oo la soo dhaafay
+
+elements.yearSelect.innerHTML = ''; // tirtir wixii hore
+
+for (let y = currentYear; y >= startYear; y--) {
+    const option = document.createElement('option');
+    option.value = y;
+    option.textContent = y;
+    if (y === currentYear) option.selected = true; // ha ahaado sanadka hadda mid xulan
+    elements.yearSelect.appendChild(option);
+}
 }
 
 function setupEventListeners() {
@@ -105,7 +109,7 @@ function addStudent() {
     const name = elements.studentName.value.trim();
 
     if (!name) {
-        showToast('Fadlan geli magaca ardayga', 'error');
+        showToast('Fadlan geli magaca ardayga, ugu horreyn', 'error');
         return;
     }
 
@@ -130,7 +134,7 @@ function addStudent() {
             students[studentIndex].name = name;
             saveToLocalStorage();
             renderList();
-            showToast('Magaca ardayga waa la cusboonaysiiyay', 'success');
+            showToast('Magaca waa la cusboonaysiiyay', 'success');
         }
         cancelEdit();
     }
@@ -197,7 +201,7 @@ function renderList() {
                 <div class="empty-icon">
                     <i class="fas fa-book-reader"></i>
                 </div>
-                <h3 class="empty-title">${currentSearch ? 'Wax arday ah lama helin' : 'Ma jiraan arday diiwaangashan'}</h3>
+                <h3 class="empty-title">${currentSearch ? 'Wax arday ah lama helin' : 'Ma jiraan arday diiwaangashan' laga yaabee inaad wax ka qaladday magaca}</h3>
                 <p>${currentSearch ? 'Hmmm.. lama helin wax arday ah oo ku habboon raadintaada' : 'Ku dar ardayda adiga oo isticmaalaya foomka kor'}</p>
             </div>
         `;
@@ -342,7 +346,7 @@ function clearData() {
         return;
     }
 
-    if (confirm('Ma hubtaa inaad tirtirto dhammaan xogta ardayda?\nTani waa mid aan dib uga soo celin karin!')) {
+    if (confirm('Ma hubtaa inaad tirtirto dhammaan xogta ardayda?\nTani waa mid aan dib loogu soo celin karin!')) {
         students = [];
         saveToLocalStorage();
         renderList();
