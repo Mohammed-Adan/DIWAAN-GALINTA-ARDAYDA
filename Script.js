@@ -248,24 +248,20 @@
               <i class="fas ${hasPaid ? 'fa-check-circle' : 'fa-times-circle'}"></i>
               ${monthNames[currentMonth-1]}
             </span>
-            <div class="action-buttons">
-              <button class="btn btn-sm ${hasPaid ? 'btn-danger' : 'btn-success'} tooltip" 
-                      onclick="togglePayment('${student.id}')" title="${hasPaid ? 'U celi in aan bixin' : 'Muuji inuu bixiyay'}">
-                <i class="fas ${hasPaid ? 'fa-times' : 'fa-check'}"></i>
-                <span class="tooltip-text">${hasPaid ? 'U celi in aan bixin' : 'Muuji inuu bixiyay'}</span>
-              </button>
-              <button class="btn btn-sm btn-warning tooltip" 
-                      onclick="editStudent('${student.id}')" title="Wax ka beddel">
-                <i class="fas fa-edit"></i>
-                <span class="tooltip-text">Wax ka beddel</span>
-              </button>
-              <button class="btn btn-sm btn-danger tooltip" 
-                      onclick="deleteStudent('${student.id}')" title="Tirtir">
-                <i class="fas fa-trash"></i>
-                <span class="tooltip-text">Tirtir</span>
-              </button>
-            </div>
-          </div>
+          <div class="segmented-actions">
+  <div class="segmented-group">
+    <button class="segmented-btn pay-toggle ${hasPaid ? 'paid' : 'unpaid'}" 
+            onclick="togglePayment('${student.id}')">
+      <i class="fas ${hasPaid ? 'fa-check' : 'fa-times'}"></i>
+    </button>
+    <button class="segmented-btn" onclick="editStudent('${student.id}')">
+      <i class="fas fa-pencil"></i>
+    </button>
+    <button class="segmented-btn delete" onclick="deleteStudent('${student.id}')">
+      <i class="fas fa-trash"></i>
+    </button>
+  </div>
+</div>
         `;
         container.appendChild(studentEl);
       });
