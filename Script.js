@@ -50,19 +50,23 @@ function initializeSelectors() {
     });
 
    
-       // Initialize year selector
-    const currentYear = new Date().getFullYear(); // tusaale: 2025
-const startYear = currentYear - 5; // haddii aad rabto 5 sano oo la soo dhaafay
+      // Initialize year selector
+const currentYear = new Date().getFullYear(); // Tusaale ahaan: 2025
+const endYear = currentYear + 5; // Ilaa 5 sano mustaqbalka
 
-elements.yearSelect.innerHTML = ''; // tirtir wixii hore
+elements.yearSelect.innerHTML = ''; // Tirtir wixii hore ku jiray
 
-for (let y = currentYear; y >= startYear; y--) {
-    const option = document.createElement('option');
-    option.value = y;
-    option.textContent = y;
-    if (y === currentYear) option.selected = true; // ha ahaado sanadka hadda mid xulan
-    elements.yearSelect.appendChild(option);
-}
+for (let y = currentYear; y <= endYear; y++) {
+  const option = document.createElement('option');
+  option.value = y;
+  option.textContent = y;
+
+  // Ha ahaado sanadka hadda socda mid xulan (selected)
+  if (y === currentYear) {
+    option.selected = true;
+  }
+
+  elements.yearSelect.appendChild(option);
 }
 
 function setupEventListeners() {
