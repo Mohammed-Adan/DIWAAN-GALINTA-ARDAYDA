@@ -39,7 +39,7 @@
       
       // Initialize year selector
       yearSelect.innerHTML = '';
-      for (let y = currentYear + 0; y >= currentYear - 5; y--) {
+      for (let y = currentYear + 1; y >= currentYear - 5; y--) {
         const option = document.createElement('option');
         option.value = y;
         option.textContent = y;
@@ -86,7 +86,7 @@
         if (e.key === 'Enter') addStudent();
       });
 
-    
+
     }
 
     function updateProgressBar() {
@@ -163,7 +163,7 @@
         updateSummary();
         updateProgressBar();
         
-        const status = student.payments[monthKey] ? 'Bixiyay' : 'Aan bixin';
+        const status = student.payments[monthKey] ? ' ' : 'Aan bixin';
         showToast(`Xaaladda ardayga waxaa loo beddelay ${status}`, 'success');
       }
     }
@@ -248,7 +248,7 @@
               <i class="fas ${hasPaid ? 'fa-check-circle' : 'fa-times-circle'}"></i>
               ${monthNames[currentMonth-1]}
             </span>
-          <div class="segmented-actions">
+<div class="segmented-actions">
   <div class="segmented-group">
     <button class="segmented-btn pay-toggle ${hasPaid ? 'paid' : 'unpaid'}" 
             onclick="togglePayment('${student.id}')">
@@ -447,65 +447,3 @@
         toast.classList.remove('show');
       }, 3000);
     }
-
-function addStudent() {
-  const nameInput = document.getElementById('studentName');
-  const name = nameInput.value.trim();
-
-  if (!name) {
-    showToast('Please enter student name', 'error');
-    return;
-  }
-
-  // Add student logic here...
-  const newStudent = {
-    id: Date.now().toString(),
-    name: name,
-    payments: {},
-    dateAdded: new Date().toLocaleDateString('so-SO')
-  };
-  
-  students.unshift(newStudent);
-  saveToLocalStorage();
-  renderList();
-
-  // CLEAR THE INPUT FIELD (THIS IS THE KEY PART)
-  nameInput.value = ''; // This line does the clearing
-  nameInput.focus();   // Optional: keeps the field ready for next entry
-
-  showToast('Student added successfully', 'success');
-}
-
-function addStudent() {
-  const nameInput = document.getElementById('studentName');
-  const name = nameInput.value.trim();
-
-  if (!name) {
-    showToast('Please enter student name', 'error');
-    return;
-  }
-
-  // 1. Add student to list
-  const newStudent = {
-    id: Date.now().toString(),
-    name: name,
-    payments: {},
-    dateAdded: new Date().toLocaleDateString('so-SO')
-  };
-  students.unshift(newStudent);
-  saveToLocalStorage();
-  renderList();
-
-  // 2. Clear the input field
-  nameInput.value = '';
-
-  // 3. Hide the keyboard (two methods)
-  
-  // METHOD 1: Blur the input (most reliable)
-  nameInput.blur(); // This makes the keyboard disappear
-
-  // METHOD 2: Switch focus to another element
-  // document.getElementById('someOtherElement').focus();
-  
-  showToast('Student added successfully', 'success');
-}
