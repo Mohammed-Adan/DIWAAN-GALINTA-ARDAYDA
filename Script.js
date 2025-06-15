@@ -50,12 +50,20 @@ function initializeSelectors() {
     });
 
    
-    // Initialize year selector elements.yearSelect.innerHTML = ''; for (let y = currentYear; y <= currentYear + 5; y++) { const option = document.createElement('option'); option.value = y; option.textContent = y; if (y === currentYear) option.selected = true; elements.yearSelect.appendChild(option); } }
+       // Initialize year selector
+    const currentYear = new Date().getFullYear(); // tusaale: 2025
+const startYear = currentYear - 5; // haddii aad rabto 5 sano oo la soo dhaafay
 
+elements.yearSelect.innerHTML = ''; // tirtir wixii hore
 
-
-
-
+for (let y = currentYear; y >= startYear; y--) {
+    const option = document.createElement('option');
+    option.value = y;
+    option.textContent = y;
+    if (y === currentYear) option.selected = true; // ha ahaado sanadka hadda mid xulan
+    elements.yearSelect.appendChild(option);
+}
+}
 
 function setupEventListeners() {
     // Search input
