@@ -814,9 +814,7 @@
       100% { transform: scale(1); }
     }
     
-    .unpaid {
-      animation: pulse 2s infinite;
-    }
+    
     
     .student-item.new {
       animation: highlight 3s ease;
